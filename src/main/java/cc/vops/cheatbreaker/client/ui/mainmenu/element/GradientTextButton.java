@@ -1,0 +1,117 @@
+package cc.vops.cheatbreaker.client.ui.mainmenu.element;
+
+
+import cc.vops.cheatbreaker.client.ui.fading.ColorFade;
+import cc.vops.cheatbreaker.client.ui.mainmenu.AbstractElement;
+import cc.vops.cheatbreaker.client.util.font.Fonts;
+import cc.vops.cheatbreaker.client.util.RenderUtil;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+
+import java.awt.*;
+
+public class GradientTextButton extends AbstractElement {
+    @Getter
+    @Setter
+    private String text;
+    private final ColorFade outlineFade;
+    private final ColorFade upperBackgroundFade;
+    private final ColorFade lowerBackgroundFade;
+    private int[] colors;
+
+    public GradientTextButton(String string) {
+        this.text = string;
+        this.outlineFade = new ColorFade(
+                new Color(0xFF262626),
+                new Color(0xFF50A05C)
+        );
+
+        this.upperBackgroundFade = new ColorFade(
+                new Color(0xFF323232),
+                new Color(0xFF64B96E)
+        );
+
+        this.lowerBackgroundFade = new ColorFade(
+                new Color(0xFF2A2A2A),
+                new Color(0xFF55A562)
+        );
+    }
+
+    public void applyLighterColorState() {
+        this.setColors(new int[] {
+                new Color(0xFF565656).getRGB(),
+                new Color(0xFF50A05C).getRGB(),
+
+                new Color(0xFF626262).getRGB(),
+                new Color(0xFF64B96E).getRGB(),
+
+                new Color(0xFF4F4F4F).getRGB(),
+                new Color(0xFF55A562).getRGB()
+        });
+    }
+
+    public void applySelectedColorState() {
+        this.setColors(new int[] {
+                new Color(0xFF50A05C).getRGB(),
+                new Color(0xFF50A05C).getRGB(),
+
+                new Color(0xFF64B96E).getRGB(),
+                new Color(0xFF64B96E).getRGB(),
+
+                new Color(0xFF55A562).getRGB(),
+                new Color(0xFF55A562).getRGB()
+        });
+    }
+
+    public void applyDefaultColorState() {
+        this.setColors(new int[] {
+                new Color(0xFF262626).getRGB(),
+                new Color(0xFF50A05C).getRGB(),
+
+                new Color(0xFF323232).getRGB(),
+                new Color(0xFF64B96E).getRGB(),
+
+                new Color(0xFF2A2A2A).getRGB(),
+                new Color(0xFF55A562).getRGB()
+        });
+    }
+
+    private void setColors(int[] arrn) {
+        this.colors = arrn;
+    }
+
+    @Override
+    protected void handleElementDraw(GuiGraphicsExtractor gfx, float mouseX, float mouseY, boolean enableMouse) {
+        boolean bl2 = enableMouse && this.isMouseInside(mouseX, mouseY);
+        if (this.colors != null && this.outlineFade.isExpired()) {
+            this.outlineFade.setStartColor(this.colors[0]);
+            this.outlineFade.setEndColor(this.colors[1]);
+            this.upperBackgroundFade.setStartColor(this.colors[2]);
+            this.upperBackgroundFade.setEndColor(this.colors[3]);
+            this.lowerBackgroundFade.setStartColor(this.colors[4]);
+            this.lowerBackgroundFade.setEndColor(this.colors[5]);
+            this.colors = null;
+        }
+        RenderUtil.drawCorneredGradientRectWithOutline(gfx, this.x, this.y, this.x + this.width, this.y + this.height, this.outlineFade.get(bl2).getRGB(), this.upperBackgroundFade.get(bl2).getRGB(), this.lowerBackgroundFade.get(bl2).getRGB());
+
+        RenderUtil.drawCenteredString(
+                gfx,
+                Fonts.robotoRegular13,
+                this.text,
+                (this.x + this.width / 2.0f),
+                (this.y + (this.height - Fonts.robotoRegular13.height()) / 2.0f),
+                -1
+        );
+    }
+
+    public void draw(GuiGraphicsExtractor gfx, float mouseX, float mouseY, boolean enabled) {
+        this.handleElementDraw(gfx, mouseX, mouseY, enabled);
+    }
+
+    @Override
+    public boolean handleElementMouseClicked(float mouseX, float mouseY, int mouseButton, boolean enableMouse) {
+        if (!enableMouse) return false;
+        return false;
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "providers": [
+        {
+            "type": "ttf",
+            "file": "cheatbreaker:ttf/roboto-regular.ttf",
+            "size": 12,
+            "shift": [0,0],
+            "oversample": 2
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "providers": [
+        {
+            "type": "ttf",
+            "file": "cheatbreaker:ttf/play-regular.ttf",
+            "size": 7,
+            "shift": [0,-0.5],
+            "oversample": 2
+        }
+    ]
+}

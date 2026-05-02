@@ -1,0 +1,9 @@
+package cc.vops.cheatbreaker.client.util.cbagent;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(value=RetentionPolicy.RUNTIME)
+public @interface CBAgentBooleanReference {
+}
+ 

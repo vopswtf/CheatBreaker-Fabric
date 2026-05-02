@@ -1,0 +1,27 @@
+package cc.vops.cheatbreaker.client.websocket.server;
+
+import cc.vops.cheatbreaker.client.util.ByteBufWrapper;
+import cc.vops.cheatbreaker.client.websocket.AssetsWebSocket;
+import cc.vops.cheatbreaker.client.websocket.WSPacket;
+import cc.vops.cheatbreaker.client.websocket.client.WSPacketHello;
+import net.minecraft.client.Minecraft;
+
+import java.io.IOException;
+
+public class WSPacketWelcome extends WSPacket {
+    @Override
+    public void write(ByteBufWrapper var1) {
+
+    }
+
+    @Override
+    public void read(ByteBufWrapper var1) throws IOException {
+    }
+
+    @Override
+    public void handle(AssetsWebSocket socket) {
+        Minecraft.getInstance().getProfileKeyPairManager().prepareKeyPair().whenComplete((keyPair, throwable) -> {
+            keyPair.ifPresent(profileKeyPair -> socket.send(new WSPacketHello(profileKeyPair)));
+        });
+    }
+}

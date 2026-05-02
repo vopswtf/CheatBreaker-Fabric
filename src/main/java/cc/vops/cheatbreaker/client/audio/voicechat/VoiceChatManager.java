@@ -1,0 +1,349 @@
+package cc.vops.cheatbreaker.client.audio.voicechat;
+
+import cc.vops.cheatbreaker.CheatBreaker;
+import cc.vops.cheatbreaker.client.audio.*;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.AbstractClientPlayer;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+@Getter
+public class VoiceChatManager {
+
+    public final Map<UUID, ClientStream> talking;
+    private Map<UUID, PlayerProxy> playerData;
+    private List<ClientStream> currentStreams;
+    private MicrophoneRecorder recorder;
+    private final Minecraft mc;
+    private final ThreadSoundQueue threadQueue;
+    public ConcurrentLinkedQueue<Datalet> queue;
+    private final Thread threadUpdate;
+    private final SoundDecoder decoder;
+    private boolean volumeControlActive;
+
+
+    @Setter
+    private boolean voiceChatEnabled = false;
+    @Setter private VoiceChannel voiceChannel = null;
+    private final List<VoiceChannel> voiceChannels = new ArrayList<>();
+    private final List<UUID> voiceUsers = new ArrayList<>();
+    private final List<UUID> mutedUsers = new ArrayList<>();
+
+    private float WEATHER;
+    private float RECORDS;
+    private float BLOCKS;
+    private float MOBS;
+    private float ANIMALS;
+
+    @Getter
+    private static boolean existent = false;
+
+    public VoiceChatManager() {
+        this.talking = new HashMap<>();
+        this.playerData = new HashMap<>();
+        this.currentStreams = new ArrayList<>();
+        this.mc = Minecraft.getInstance();
+        this.queue = new ConcurrentLinkedQueue<>();
+        new Thread(
+                this.threadQueue = new ThreadSoundQueue(this),
+                "Client Stream Queue"
+        ).start();
+        this.decoder = new SoundDecoder();
+        this.threadUpdate = new Thread(new ThreadUpdateStream(this));
+        this.threadUpdate.start();
+    }
+
+    public VoiceChatManager(AudioDevice microphone) {
+        this.talking = new HashMap<>();
+        this.playerData = new HashMap<>();
+        this.currentStreams = new ArrayList<>();
+        this.recorder = new MicrophoneRecorder(microphone);
+        this.mc = Minecraft.getInstance();
+        this.queue = new ConcurrentLinkedQueue<>();
+        new Thread(
+                this.threadQueue = new ThreadSoundQueue(this),
+                "Client Stream Queue"
+        ).start();
+        this.decoder = new SoundDecoder();
+        this.threadUpdate = new Thread(new ThreadUpdateStream(this));
+        this.threadUpdate.start();
+        existent = true;
+    }
+
+    public void setTalking(boolean talking) {
+        if (isExistent()) {
+            recorder.set(talking);
+        }
+    }
+
+    public void addQueue(final byte[] decoded_data, UUID uniqueId) {
+        if (isExistent()) {
+            this.queue.offer(new Datalet(uniqueId, decoded_data));
+            synchronized (this.threadQueue) {
+                this.threadQueue.notify();
+            }
+        }
+    }
+
+    public void alertEnd(final UUID uniqueId) {
+        if (isExistent()) {
+            this.queue.offer(new Datalet(uniqueId, null));
+            synchronized (this.threadQueue) {
+                this.threadQueue.notify();
+            }
+        }
+    }
+
+//    public void handleIncoming(PacketVoice packetVoice) {
+//        if (isExistent()) {
+//            if (currentStreams.isEmpty()) {
+//                volumeControlStop();
+//            } else if (isVolumeControlActive()) {
+//                volumeControlStart();
+//            }
+//            decoder.process(packetVoice.getUuid(), packetVoice.getData(), 62);
+//        }
+//    }
+
+    public boolean newDatalet(Datalet data) {
+        if (isExistent()) {
+            return !talking.containsKey(data.id);
+        }
+
+        return false;
+    }
+
+    public void createStream(Datalet data) {
+        if (isExistent()) {
+//            final SoundSystem sndSystem = Ref.getMinecraft().bridge$getSoundHandler().bridge$getSoundManager().bridge$getSoundSystem();
+//            final String identifier = generateSource(data.id);
+//            final PlayerProxy player = this.getPlayerData(data.id);
+//            if (sndSystem != null) {
+//                if (data.direct) {
+//                    final Vector3f position = player.position();
+//                    sndSystem.rawDataStream(
+//                            CheatBreaker.universalAudioFormat,
+//                            true,
+//                            identifier,
+//                            position.x,
+//                            position.y,
+//                            position.z,
+//                            2,
+//                            63f // modify later
+//                    );
+//                } else {
+//                    sndSystem.rawDataStream(
+//                            CheatBreaker.universalAudioFormat,
+//                            true,
+//                            identifier,
+//                            (float) this.mc.bridge$getThePlayer().bridge$getPosX(),
+//                            (float) this.mc.bridge$getThePlayer().bridge$getPosY(),
+//                            (float) this.mc.bridge$getThePlayer().bridge$getPosZ(),
+//                            2,
+//                            (float) 63f // modify later
+//                    );
+//                }
+//                sndSystem.setPitch(identifier, 1.0f);
+//                if (data.volume != -1) {
+//                    sndSystem.setVolume(identifier, data.volume);
+//                } else {
+//                    sndSystem.setVolume(identifier, CheatBreaker.getInstance().getGlobalSettings().speakerVolume.<Integer>value() / 100f);
+//                }
+//            }
+//            addStreamSafe(new ClientStream(player, data.id, data.direct));
+//            giveStream(data);
+        }
+    }
+
+    private void addStreamSafe(ClientStream stream) {
+        if (isExistent()) {
+            this.talking.put(stream.id, stream);
+            synchronized (this.threadUpdate) {
+                this.threadUpdate.notify();
+            }
+            if (!this.containsStream(stream.id)) {
+                this.currentStreams.add(stream);
+            }
+        }
+    }
+
+    public boolean containsStream(final UUID id) {
+        if (isExistent()) {
+            final ClientStream currentStream = this.talking.get(id);
+            for (final ClientStream stream : this.currentStreams) {
+                if (currentStream != null && currentStream.proxy != null) {
+                    final String currentName = currentStream.proxy.entityName();
+                    final String otherName = stream.proxy.entityName();
+                    if (stream.proxy.entityName() != null && currentStream.proxy.entityName() != null && currentName.equals(otherName)) {
+                        return true;
+                    }
+                } else {
+                    System.err.println("stream is null.");
+                    return false;
+                }
+                if (stream.id == id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+
+    private PlayerProxy getPlayerData(final UUID entityId) {
+        if (isExistent() && this.mc.level != null) {
+            PlayerProxy proxy = this.playerData.get(entityId);
+            AbstractClientPlayer entity = null;
+            for (AbstractClientPlayer obj : this.mc.level.players()) {
+                if (obj.getUUID().equals(entityId)) {
+                    entity = obj;
+                    break;
+                }
+            }
+            if (proxy == null) {
+                if (entity != null) {
+                    proxy = new PlayerProxy(entity, entityId, entity.getName().getString(), entity.getX(), entity.getY(), entity.getZ());
+                } else {
+                    System.err.println("Major error, no entity found for player.");
+                    proxy = new PlayerProxy(null, entityId, "" + entityId, 0.0, 0.0, 0.0);
+                }
+                this.playerData.put(entityId, proxy);
+            } else if (entity != null) {
+                proxy.setPlayer(entity);
+                proxy.setName(entity.getName().getString());
+            }
+            return proxy;
+        }
+
+        return new PlayerProxy(null, entityId, "" + entityId, 0.0, 0.0, 0.0);
+    }
+
+    public void giveStream(Datalet data) {
+        if (isExistent()) {
+//            final SoundSystem sndSystem = Ref.getMinecraft().bridge$getSoundHandler().bridge$getSoundManager().bridge$getSoundSystem();
+//            ClientStream voiceChatData = talking.get(data.id);
+//            String identifier = generateSource(data.id);
+//            if (voiceChatData != null) {
+//                voiceChatData.update(data, (int) (System.currentTimeMillis() - voiceChatData.lastUpdated));
+//                voiceChatData.buffer.push(data.data);
+//                voiceChatData.buffer.updateJitter(voiceChatData.getJitterRate());
+//                if (voiceChatData.buffer.isReady() || voiceChatData.needsEnd) {
+//                    if (sndSystem != null) {
+//                        sndSystem.flush(identifier);
+//                        sndSystem.feedRawAudioData(identifier, voiceChatData.buffer.get());
+//                    }
+//                    voiceChatData.buffer.clearBuffer(voiceChatData.getJitterRate());
+//                }
+//                voiceChatData.lastUpdated = System.currentTimeMillis();
+//            }
+        }
+    }
+
+    public String generateSource(UUID id) {
+        return "" + id.hashCode();
+    }
+
+    public void killStream(ClientStream stream) {
+        if (isExistent()) {
+            if (stream != null) {
+                this.currentStreams.remove(stream);
+                this.talking.remove(stream.id);
+            }
+        }
+    }
+
+    public VoiceUser getVoiceUser(UUID id) {
+        if (isExistent()) {
+            VoiceChannel channel = this.voiceChannel;
+            if (channel != null) {
+                for (VoiceUser user : channel.getUsers()) {
+                    if (user.getUUID().equals(id)) {
+                        return user;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private VoiceChannel getVoiceChannel(UUID uuid) {
+        for (VoiceChannel voiceChannel : this.voiceChannels) {
+            if (!voiceChannel.getUuid().equals(uuid)) continue;
+            return voiceChannel;
+        }
+        return null;
+    }
+
+    public void giveEnd(UUID id) {
+        if (isExistent()) {
+            final ClientStream stream = this.talking.get(id);
+            if (stream != null) {
+                stream.needsEnd = true;
+            }
+            alertEnd(id);
+        }
+    }
+
+    public void switchMicrophone(AudioDevice device) {
+        if (isExistent()) {
+            if (this.recorder != null) {
+                this.recorder.stop();
+            }
+            this.recorder = new MicrophoneRecorder(device);
+        }
+    }
+
+    public void volumeControlStart() {
+        if (isExistent()) {
+            if (!this.volumeControlActive) {
+//                final float attenuation = CheatBreaker.getInstance().getGlobalSettings().attenuation.<Integer>value() / 100f;
+//                this.WEATHER = this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.WEATHER);
+//                this.RECORDS = this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.RECORDS);
+//                this.BLOCKS = this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.BLOCKS);
+//                this.MOBS = this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.MOBS);
+//                this.ANIMALS = this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.PLAYERS);
+//                if (this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.WEATHER) > 1.0f - attenuation) {
+//                    this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.WEATHER, 1.0f - attenuation);
+//                }
+//                if (this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.RECORDS) > 1.0f - attenuation) {
+//                    this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.RECORDS, 1.0f - attenuation);
+//                }
+//                if (this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.BLOCKS) > 1.0f - attenuation) {
+//                    this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.BLOCKS, 1.0f - attenuation);
+//                }
+//                if (this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.MOBS) > 1.0f - attenuation) {
+//                    this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.MOBS, 1.0f - attenuation);
+//                }
+//                if (this.mc.bridge$getGameSettings().bridge$getSoundLevel(SoundCategoryBridge.ANIMALS) > 1.0f - attenuation) {
+//                    this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.ANIMALS, 1.0f - attenuation);
+//                }
+//                this.volumeControlActive = true;
+            }
+        }
+    }
+
+    public void volumeControlStop() {
+        if (isExistent()) {
+            if (this.volumeControlActive) {
+//                this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.WEATHER, this.WEATHER);
+//                this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.RECORDS, this.RECORDS);
+//                this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.BLOCKS, this.BLOCKS);
+//                this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.MOBS, this.MOBS);
+//                this.mc.bridge$getGameSettings().bridge$setSoundLevel(SoundCategoryBridge.ANIMALS, this.ANIMALS);
+//                this.volumeControlActive = false;
+            }
+        }
+    }
+
+    public void handlePosition(UUID uniqueID, double var3, double var5, double var7) {
+        if (isExistent()) {
+            if (containsStream(uniqueID)) {
+                getPlayerData(uniqueID).setPosition(var3, var5, var7);
+            }
+        }
+    }
+
+}

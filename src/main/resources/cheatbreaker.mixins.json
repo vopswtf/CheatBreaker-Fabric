@@ -1,0 +1,62 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "cc.vops.cheatbreaker.mixin",
+    "compatibilityLevel": "JAVA_25",
+    "mixins": [
+        "AbilitiesMixin",
+        "debug.Matrix3x2fStackAccessor",
+        "debug.Matrix3x2fStackMixin",
+        "freelook.EntityMixin"
+    ],
+    "client": [
+        "CapeLayerMixin",
+        "ChatComponentMixin",
+        "ClientLevelMixin",
+        "ClientPacketListenerMixin",
+        "ClientPlayNetworkHandlerMixin",
+        "CubeMapMixin",
+        "FontAccessor",
+        "FontResourceManagerAccessor",
+        "GameRendererAccessor",
+        "GameRendererMixin",
+        "GuiMixin",
+        "IdentifierMixin",
+        "KeyboardHandlerMixin",
+        "KeyMappingAccessor",
+        "KeyMappingCategoryMixin",
+        "LayerDefinitionsMixin",
+        "LoadingOverlayMixin",
+        "MinecraftAccessor",
+        "MinecraftMixin",
+        "MouseHandlerMixin",
+        "NetHandlerMixin",
+        "OnlineServerEntryMixin",
+        "OptionsMixin",
+        "PauseScreenMixin",
+        "PlayerModelMixin",
+        "PlayerTabMixin",
+        "RenderSystemAccessor",
+        "ServerListMixin",
+        "TTFAccessor",
+        "UnitDoubleMixin",
+        "combat.ItemInHandRendererMixin",
+        "combat.SwingFixMixin",
+        "freelook.CameraAccessor",
+        "freelook.CameraMixin",
+        "module.PotionStatusMixin",
+        "module.ScoreboardMixin",
+        "module.ToggleSprintMixin",
+        "module.bossbar.BossBarAccessor",
+        "module.bossbar.BossBarMixin",
+        "module.minimap.GuiMixin",
+        "nametag.AvatarRendererMixin",
+        "nametag.LivingEntityRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    },
+    "overwrites": {
+        "requireAnnotations": true
+    }
+}

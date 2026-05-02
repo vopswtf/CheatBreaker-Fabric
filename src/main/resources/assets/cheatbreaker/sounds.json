@@ -1,0 +1,17 @@
+{
+    "message": {
+        "sounds": [ "cheatbreaker:message" ]
+    },
+    "short_whoosh1": {
+        "sounds": [ "cheatbreaker:short_whoosh1" ]
+    },
+    "shutter": {
+        "sounds": [ "cheatbreaker:shutter" ]
+    },
+    "voice_down": {
+        "sounds": [ "cheatbreaker:voice_down" ]
+    },
+    "voice_up": {
+        "sounds": [ "cheatbreaker:voice_up" ]
+    }
+}
