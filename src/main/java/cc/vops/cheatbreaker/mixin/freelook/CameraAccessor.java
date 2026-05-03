@@ -31,4 +31,7 @@ public interface CameraAccessor {
 
     @Accessor("LEFT")
     Vector3f LEFT();
+
+    @Accessor
+    void setMatrixPropertiesDirty(int dirty);
 }

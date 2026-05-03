@@ -44,6 +44,8 @@ public class EntityMixin {
                 cameraAccessor.FORWARDS().rotate(cameraAccessor.getRotation(), new Vector3f(camera.forwardVector().x(), camera.forwardVector().y(), camera.forwardVector().z()));
                 cameraAccessor.UP().rotate(cameraAccessor.getRotation(), new Vector3f(camera.upVector().x(), camera.upVector().y(), camera.upVector().z()));
                 cameraAccessor.LEFT().rotate(cameraAccessor.getRotation(), new Vector3f(camera.leftVector().x(), camera.leftVector().y(), camera.leftVector().z()));
+
+                cameraAccessor.setMatrixPropertiesDirty(3);
             }
         } else {
             previousCameraXRot = -1;
