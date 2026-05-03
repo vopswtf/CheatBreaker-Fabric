@@ -3,26 +3,21 @@ package cc.vops.cheatbreaker.mixin;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.GlobalSettings;
 import cc.vops.cheatbreaker.client.event.type.KeyboardEvent;
-import cc.vops.cheatbreaker.client.ui.AbstractGui;
 import cc.vops.cheatbreaker.client.ui.cosmetic.EmoteGUI;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
 import cc.vops.cheatbreaker.client.ui.overlay.VoiceChatScreen;
 import cc.vops.cheatbreaker.client.util.Keyboard;
-import cc.vops.cheatbreaker.client.util.Sounds;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.glfw.GLFW;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(KeyboardHandler.class)
@@ -33,6 +28,7 @@ public class KeyboardHandlerMixin {
     private void keyPress(long window, int action, KeyEvent event, CallbackInfo callbackInfo) {
         if (window == Minecraft.getInstance().getWindow().handle()) {
             if (action == GLFW.GLFW_PRESS) {
+                Keyboard.setKeyEvent(event);
                 CheatBreaker.getInstance().getEventBus().callEvent(new KeyboardEvent(event));
 
                 if (event.key() == GlobalSettings.getKeyCode(CheatBreaker.getInstance().getGlobalSettings().openVoiceMenu)) {
@@ -73,9 +69,18 @@ public class KeyboardHandlerMixin {
                     }
                 }
             } else if (action == GLFW.GLFW_RELEASE) {
+                Keyboard.setCharEvent(null);
+                Keyboard.setKeyEvent(null);
 //                Keyboard.eventKeyState = false;
 //                Keyboard.eventKey = -1;
             }
+        }
+    }
+
+    @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
+    private void charTyped(long handle, CharacterEvent event, CallbackInfo ci) {
+        if (handle == Minecraft.getInstance().getWindow().handle()) {
+            Keyboard.setCharEvent(event);
         }
     }
 }

@@ -25,6 +25,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MouseHandlerMixin {
     @Shadow @Final private Minecraft minecraft;
 
+    @Shadow private double xpos;
+
+    @Shadow private double ypos;
+
     @Inject(method = "onButton", at = @At("HEAD"))
     private void onButton(long window, MouseButtonInfo mouseButtonInfo, int action, CallbackInfo callbackInfo) {
         if (window == Minecraft.getInstance().getWindow().handle()) {
@@ -49,5 +53,11 @@ public class MouseHandlerMixin {
                 ((AbstractGui) minecraft.screen).onMouseScroll(yDelta);
             }
         }
+    }
+
+    @Inject(method = "onMove", at = @At("RETURN"))
+    private void onMove(long window, double xPos, double yPos, CallbackInfo callbackInfo) {
+        Mouse.mouseX = xpos;
+        Mouse.mouseY = ypos;
     }
 }

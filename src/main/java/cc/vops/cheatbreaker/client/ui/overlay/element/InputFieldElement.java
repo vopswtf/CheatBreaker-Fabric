@@ -1,10 +1,13 @@
 package cc.vops.cheatbreaker.client.ui.overlay.element;
 
+import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.ui.mainmenu.AbstractElement;
 import cc.vops.cheatbreaker.client.util.ChatAllowedCharacters;
 import cc.vops.cheatbreaker.client.util.Keyboard;
+import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.font.CBFontRenderer;
+import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -14,7 +17,6 @@ public class InputFieldElement extends AbstractElement {
     private final CBFontRenderer font;
     private String text = "";
     private int maxStringLength = 32;
-    private int cursorCounter;
     private boolean enableBackgroundDrawing = true;
     private boolean canLoseFocus = true;
     private boolean isFocused;
@@ -28,6 +30,10 @@ public class InputFieldElement extends AbstractElement {
     private final int color1;
     private final int color2;
     private final String label;
+    @Setter
+    private int fontColor = -1;
+    private boolean showCursor;
+    private long lastCursorChangeTime;
 
     public InputFieldElement(CBFontRenderer font, String label, int color1, int color2) {
         this.font = font;
@@ -37,7 +43,11 @@ public class InputFieldElement extends AbstractElement {
     }
 
     public void updateCursorCounter() {
-        ++this.cursorCounter;
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - this.lastCursorChangeTime >= 500) {
+            this.showCursor = !this.showCursor;
+            this.lastCursorChangeTime = currentTime;
+        }
     }
 
     public void setText(String string) {
@@ -170,6 +180,7 @@ public class InputFieldElement extends AbstractElement {
     public void setCursorPositionEnd() {
         this.setCursorPosition(this.text.length());
     }
+
     public void textboxKeyTyped(char c, int modifiers) {
         if (!this.isFocused) {
             return;
@@ -209,7 +220,7 @@ public class InputFieldElement extends AbstractElement {
                 break;
         }
 
-        switch (Character.toLowerCase(c)) {
+        switch ((int) c) {
             case GLFW.GLFW_KEY_BACKSPACE:
                 if (this.isEnabled) {
                     if (ctrl) this.deleteWords(-1);
@@ -298,7 +309,7 @@ public class InputFieldElement extends AbstractElement {
             int n2 = this.cursorPosition - this.lineScrollOffset;
             int n3 = this.selectionEnd - this.lineScrollOffset;
             boolean bl = n2 >= 0 && n2 <= string.length();
-            boolean bl2 = this.isFocused && this.cursorCounter / 6 % 2 == 0 && bl;
+            boolean bl2 = this.isFocused && this.showCursor && bl;
             float f = this.enableBackgroundDrawing ? this.x + (float)4 : this.x;
             float f2 = this.enableBackgroundDrawing ? this.y + (this.height - (float)8) / 2.0f : this.y;
             float f3 = f;
@@ -307,10 +318,10 @@ public class InputFieldElement extends AbstractElement {
             }
             if (!string.isEmpty()) {
                 String string2 = bl ? string.substring(0, n2) : string;
-                RenderUtil.drawString(gfx, font, string2, f, f2, -1);
+                RenderUtil.drawString(gfx, font, string2, f, f2, fontColor);
                 f3 = font.width(string2) + f;
             } else if (!this.isFocused()) {
-                RenderUtil.drawString(gfx, font, label, f, f2, -1);
+                RenderUtil.drawString(gfx, font, label, f, f2, fontColor);
             }
             boolean bl3 = this.cursorPosition < this.text.length() || this.text.length() >= this.getMaxStringLength();
             float f4 = f3;
@@ -325,14 +336,25 @@ public class InputFieldElement extends AbstractElement {
             }
             if (bl2) {
                 if (bl3) {
-                    RenderUtil.drawRect(gfx, f4, f2 - 1.0f, f4 + 1.0f, f2 + 1.0f + this.font.height(), -3092272);
+                    RenderUtil.drawRect(gfx, f4, f2 - 1.0f, f4 + 1.0f, f2 + 1.0f + this.font.height(), fontColor == -1 ? -3092272 : fontColor);
                 } else {
-                    RenderUtil.drawString(gfx, font, "_", f4, f2, n);
+                    RenderUtil.drawString(gfx, font, "_", f4, f2, fontColor == -1 ? n : fontColor);
                 }
             }
             if (n3 != n2) {
                 float f5 = f + (float)this.font.width(string.substring(0, n3));
-                this.drawCursorVertical(gfx, f4, f2 - 1.0f, f5 - 1.0f, f2 + 1.0f + this.font.height() + 2.0f);
+                this.drawCursorVertical(gfx, f4 + 1.5f, f2 - 3.0f, f5 + 1.5f, f2 + 1.5f + this.font.height());
+            }
+        }
+
+        if (isFocused && Mouse.isButtonDown(0) || Mouse.isButtonDown(1)) {
+            double mouseX = Mouse.getX() * CheatBreaker.getInverseScaleFactor();
+            double mouseY = Mouse.getY() * CheatBreaker.getInverseScaleFactor();
+
+            if (this.isMouseInside(mouseX, mouseY)) {
+                this.setFocused(true);
+            } else if (this.canLoseFocus) {
+                this.setFocused(false);
             }
         }
     }
@@ -393,7 +415,7 @@ public class InputFieldElement extends AbstractElement {
 
     public void setFocused(boolean bl) {
         if (bl && !this.isFocused) {
-            this.cursorCounter = 0;
+            this.showCursor = false;
         }
         this.isFocused = bl;
     }

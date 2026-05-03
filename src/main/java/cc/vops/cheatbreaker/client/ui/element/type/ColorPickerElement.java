@@ -395,7 +395,7 @@ public class ColorPickerElement extends AbstractModuleTypeElement {
                 CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                 int defaultColor = (Integer) this.setting.getDefaultValue();
                 this.setting.setValue(defaultColor, false);
-                CheatBreaker.LOGGER.info("Reset color to default: " + Integer.toHexString(defaultColor));
+//                CheatBreaker.LOGGER.info("Reset color to default: " + Integer.toHexString(defaultColor));
             }
         }
     }

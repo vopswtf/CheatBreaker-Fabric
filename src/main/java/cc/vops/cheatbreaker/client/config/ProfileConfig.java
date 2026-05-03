@@ -13,6 +13,7 @@ public class ProfileConfig {
         public float xTranslation;
         public float yTranslation;
         public Map<String, Object> settings = new HashMap<>();
+        public Map<String, Integer> keybindings = new HashMap<>();
     }
 
     public Map<String, ModuleEntry> modules = new HashMap<>();

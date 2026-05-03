@@ -164,17 +164,6 @@ public class ModulePreviewElement extends AbstractModulesGuiElement {
     }
 
     private void applyDefaultColor() {
-//        if (this.module == CheatBreaker.getInstance().getModuleManager().directionHUDMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().playerListMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().enchantmentGlintMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().packTweaksMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().blockOverlayMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().hitColorMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().crosshairMod
-//                || this.module == CheatBreaker.getInstance().getModuleManager().scoreboardMod
-//                || !(Boolean) CheatBreaker.getInstance().getGlobalSettings().resetColors.getValue()) {
-//            return;
-//        }
         for (Setting cBSetting : this.module.getSettingsList()) {
             if (cBSetting.getType() != Setting.Type.INTEGER || !cBSetting.getLabel().toLowerCase().contains("color") || cBSetting.getLabel().toLowerCase().contains("background") || cBSetting.getLabel().toLowerCase().contains("pressed")) continue;
             cBSetting.setValue(CheatBreaker.getInstance().getGlobalSettings().defaultColor.getValue());

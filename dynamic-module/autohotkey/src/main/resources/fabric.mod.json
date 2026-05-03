@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "autohotkey",
+  "version": "${version}",
+
+  "name": "autohotkey",
+  "description": "",
+  "authors": [],
+  "contact": {},
+
+  "license": "All-Rights-Reserved",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+        "cc.vops.autohotkey.AutoHotKeyEntry"
+    ]
+  },
+
+  "mixins": [
+    "autohotkey.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}",
+    "cheatbreaker": "*"
+  }
+}

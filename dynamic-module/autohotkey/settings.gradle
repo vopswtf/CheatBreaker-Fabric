@@ -7,7 +7,3 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
-file("dynamic-module").eachDir { dir ->
-    include("dynamic-module:${dir.name}")
-}

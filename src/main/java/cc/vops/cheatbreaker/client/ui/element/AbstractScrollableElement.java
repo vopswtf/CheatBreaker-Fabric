@@ -1,6 +1,7 @@
 package cc.vops.cheatbreaker.client.ui.element;
 
 
+import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.element.module.ModulePreviewElement;
 import cc.vops.cheatbreaker.client.util.Mouse;
@@ -15,6 +16,7 @@ public abstract class AbstractScrollableElement extends AbstractModulesGuiElemen
     protected int y2;
     public boolean bottom = false;
     public boolean hovering = false;
+    public int anchorY = -1;
     private float scrollPosition;
 
     public AbstractScrollableElement(float scale, int x, int y, int width, int height) {
@@ -39,7 +41,7 @@ public abstract class AbstractScrollableElement extends AbstractModulesGuiElemen
     }
 
     public void preDraw(GuiGraphicsExtractor gui, int n, int n2) {
-        if (this.isMouseInside(n, n2, false)) {
+        if (this.isMouseInsideIgnoreOffset(n, n2, false)) {
             double d = Math.round(this.startPosition / (double) 25);
             this.startPosition -= d;
             if (this.startPosition != 0.0) {
@@ -63,11 +65,14 @@ public abstract class AbstractScrollableElement extends AbstractModulesGuiElemen
         gui.pose().translate(0.0f, (float) this.scrollAmount);
     }
 
-    public void postDraw(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    public void postDraw(GuiGraphicsExtractor graphics, int mx, int my) {
+        float mouseX = mx * CheatBreaker.getScaleFactor();
+        float mouseY = my * CheatBreaker.getScaleFactor();
+
         this.bottom = true;
         boolean bl = this.scrollHeight > this.height;
         graphics.pose().popMatrix();
-        if (!(!this.hovering || Mouse.isButtonDown(0) && this.isMouseInside(mouseX, mouseY, false))) {
+        if (!(!this.hovering || Mouse.isButtonDown(0))) {
             this.hovering = false;
         }
         if (this.hovering && !Mouse.isButtonDown(0)) {
@@ -84,18 +89,15 @@ public abstract class AbstractScrollableElement extends AbstractModulesGuiElemen
             boolean bl3 = (float)mouseX > (float)(this.x + this.width - 9) * this.scale && (float)mouseX < (float)(this.x + this.width - 3) * this.scale && (float)mouseY > (float)(this.y + 11) * this.scale && (double)mouseY < ((double)(this.y + 6) + d - (double)3) * (double)this.scale;
             if (Mouse.isButtonDown(0) && !this.hovering && bl3) {
                 this.hovering = true;
+                this.scrollPosition = my;
             }
-            if (this.hovering) {
-                if ((float)this.scrollAmount != this.scrollPosition && (double)this.scrollPosition != d4 / (double)2 && (double)this.scrollPosition != d4 / (double)2 + (double)(-this.scrollHeight) + (double)n3) {
-                    if ((double)mouseY > ((double)(this.y + 11) + d4 - d4 / 4.0 - d5) * (double)this.scale) {
-                        this.scrollAmount = (int)((double)this.scrollAmount - d2 / 70.0);
-                    } else if ((double)mouseY < ((double)(this.y + 11) + d4 / 4.0 - d5) * (double)this.scale) {
-                        this.scrollAmount = (int)((double)this.scrollAmount + d2 / 70.0);
-                    }
-                    this.scrollPosition = this.scrollAmount;
-                } else if ((double)mouseY > ((double)(this.y + 11) + d4 - d4 / 4.0 - d5) * (double)this.scale || (double)mouseY < ((double)(this.y + 11) + d4 / 4.0 - d5) * (double)this.scale) {
-                    this.scrollPosition = 1.0f;
-                }
+
+            if (this.hovering && Mouse.isButtonDown(0)) {
+                this.scrollAmount = (int) (this.scrollAmount - ((int)(my - this.scrollPosition) * ((double) this.scrollHeight / d)));
+                this.scrollPosition = my;
+            } else if (this.hovering) {
+                this.hovering = false;
+                this.scrollPosition = 0;
             }
             if (this.scrollAmount < -this.scrollHeight + n3) {
                 this.scrollAmount = -this.scrollHeight + n3;

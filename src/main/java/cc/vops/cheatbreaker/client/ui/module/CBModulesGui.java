@@ -9,10 +9,12 @@ import cc.vops.cheatbreaker.client.ui.element.module.ModuleListElement;
 import cc.vops.cheatbreaker.client.ui.element.module.ModulePreviewContainer;
 import cc.vops.cheatbreaker.client.ui.element.module.ModulesGuiButtonElement;
 import cc.vops.cheatbreaker.client.ui.element.profile.ProfilesListElement;
+import cc.vops.cheatbreaker.client.util.font.CBFontRenderer;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
@@ -45,6 +47,9 @@ public class CBModulesGui extends AbstractGui {
 
     public AbstractScrollableElement currentScrollableElement = null;
     public static boolean allMenusClosed = false;
+
+    private ModulesGuiButtonElement showGuidesButton;
+    public ModulesGuiButtonElement helpButton;
 
     public boolean IlIlIIIlllllIIIlIlIlIllII = false; // somethign with undoList
     public boolean showModSizeOutline = false;
@@ -92,6 +97,9 @@ public class CBModulesGui extends AbstractGui {
 
         this.profilesElement = new ProfilesListElement(f, scaledWidth / 2 - 565, scaledHeight / 2 + 14, 370, scaledHeight / 2 - 35);
         this.elementList.add(this.profilesElement);
+
+        this.showGuidesButton = new ModulesGuiButtonElement(null, "eye-64.png", 4, n2 - 32, 28, 28, -12418828, f);
+        this.helpButton = new ModulesGuiButtonElement(null, "?", 36, n2 - 32, 28, 28, -12418828, f);
 
         this.buttons.add(new ModulesGuiButtonElement(this.modulesElement, "Mods", n / 2 - 50, n2 / 2 - 19, 100, 28, -13916106, f));
         this.buttons.add(new ModulesGuiButtonElement(this.settingsElement, "cog-64.png", n / 2 + 54, n2 / 2 - 19, 28, 28, -12418828, f));
@@ -324,6 +332,9 @@ public class CBModulesGui extends AbstractGui {
             bl = false;
         }
 
+        this.showGuidesButton.handleDrawElement(gfx, (int) mouseX, (int) mouseY, delta);
+        this.helpButton.handleDrawElement(gfx, (int) mouseX, (int) mouseY, delta);
+
         Rectangle object;
 
         float f13 = (this.animationPhase * 8) / (float)255;
@@ -421,6 +432,54 @@ public class CBModulesGui extends AbstractGui {
             }
         }
 
+        if (this.helpButton.isMouseInside(mouseX, mouseY, false) && (this.focusedElement == null || !this.focusedElement.isMouseInside(mouseX, mouseY, false))) {
+            this.drawHelpMenu(gfx);
+        }
+    }
+
+    private void drawHelpMenu(GuiGraphicsExtractor gfx) {
+        gfx.pose().pushMatrix();
+
+        gfx.pose().translate(4, scaledHeight - 180);
+
+        RenderUtil.drawRoundedRect(gfx, 0.0f, 0.0f, 240, 140, 4, -1895825408);
+        RenderUtil.drawString(gfx, Fonts.ubuntuMedium16, "Shortcuts & Movement", 4, 3.0f, -1);
+        RenderUtil.drawRoundedRect(gfx, 4, 12, 234, 2.5815217f * 4.8421054f, 1.0f, 0x4FFFFFFF);
+        int n = 16;
+        this.renderRoundButton(gfx, "Mouse1", 6, n);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| " + ChatFormatting.LIGHT_PURPLE + "HOLD" + ChatFormatting.LIGHT_PURPLE + " Add mods to selected region", 80, (float)n+3, -1);
+        this.renderRoundButton(gfx, "Mouse1", 6, n += 12);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| " + ChatFormatting.LIGHT_PURPLE + "HOLD" + ChatFormatting.LIGHT_PURPLE + " Select & drag mods", 80, (float)n+3, -1);
+        this.renderRoundButton(gfx, "Mouse2", 6, n += 12);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| " + ChatFormatting.LIGHT_PURPLE + "CLICK" + ChatFormatting.LIGHT_PURPLE + " Reset mod to closest position", 80, (float)n+3, -1);
+        this.renderRoundButton(gfx, "Mouse2", 6, n += 12);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| " + ChatFormatting.LIGHT_PURPLE + "HOLD" + ChatFormatting.LIGHT_PURPLE + " Don't lock mods while dragging", 80, (float)n+3, -1);
+        this.renderRoundButton(gfx, "CTRL", 6, n += 12);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "+", 29, (float)n+3, -1);
+        this.renderRoundButton(gfx, "Mouse1", 36, n);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| Toggle (multiple) mod selection", 80, (float)n+3, -1);
+        this.renderRoundButton(gfx, "CTRL", 6, n += 12);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "+", 29, (float)n+3, -1);
+        this.renderRoundButton(gfx, "Z", 36, n);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| Undo mod movements", 80, (float)n+3, -1);
+        this.renderRoundButton(gfx, "CTRL", 6, n += 12);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "+", 29, (float)n+3, -1);
+        this.renderRoundButton(gfx, "Y", 36, n);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| Redo mod movements", 80, (float)n+3, -1);
+        n = 112;
+        this.renderRoundButton(gfx, "Up", 31, n);
+        this.renderRoundButton(gfx, "Left", 6, n += 12);
+        this.renderRoundButton(gfx, "Down", 26, n);
+        this.renderRoundButton(gfx, "Right", 51, n);
+        RenderUtil.drawString(gfx, Fonts.playRegular14, "| Move selected mod with precision", 80, (float)n, -1);
+        gfx.pose().popMatrix();
+    }
+
+    private void renderRoundButton(GuiGraphicsExtractor gfx, String string, int n, int n2) {
+        CBFontRenderer font = Fonts.playRegular14;
+        float f = font.getStringWidth(string);
+        RenderUtil.drawRoundedRect(gfx, n, n2, (float)n + f + (float)4, n2 + 10, (double)2, -1073741825);
+        font.drawString(gfx, string, n + 1, (float)n2+ 2, -16777216);
     }
 
     private void setFocusedElement(int n) {
@@ -692,6 +751,11 @@ public class CBModulesGui extends AbstractGui {
             }
 
             if (draggingModule == null) {
+                if (this.showGuidesButton.isMouseInside(mouseX, mouseY, false)) {
+                    CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                    this.showModSizeOutline = !this.showModSizeOutline;
+                    return true;
+                }
                 if (this.handleMainButtonPress((int) mouseX, (int) mouseY, button)) return true;
                 handleModulePreviewClick(mouseX, mouseY, button);
             }

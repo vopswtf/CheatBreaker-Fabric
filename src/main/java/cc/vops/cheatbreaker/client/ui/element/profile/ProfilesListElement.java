@@ -97,9 +97,9 @@ public class ProfilesListElement extends AbstractScrollableElement {
             for (Profile profile : CheatBreaker.getInstance().getProfiles()) {
                 this.profileElementList.add(new ProfileElement(this, this.highlightColor, profile, this.scale));
             }
-            System.out.println("Loaded " + this.profileElementList.size() + " profiles.");
+//            System.out.println("Loaded " + this.profileElementList.size() + " profiles.");
             for (ProfileElement profileElement : this.profileElementList) {
-                System.out.println("Loaded profile " + profileElement.profile.getName() + " with index " + profileElement.profile.getIndex());
+//                System.out.println("Loaded profile " + profileElement.profile.getName() + " with index " + profileElement.profile.getIndex());
             }
             this.profileElementList.sort((profileElement1, profileElement2) -> {
                 if (profileElement1.profile.getName().equalsIgnoreCase("default")) {

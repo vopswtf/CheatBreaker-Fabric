@@ -34,6 +34,15 @@ public class Setting {
     public boolean rainbow;
     public int[] colorArray;
 
+    @Getter @Setter
+    private boolean editableString = false;
+
+    // binds
+    @Getter @Setter private String displayName = "Unknown";
+    @Getter private int keyCode;
+    @Getter private boolean hasKeycode = false;
+    @Getter @Setter private boolean allowMouseKeybinding = false;
+
     public Setting(String label) {
         if (label.isEmpty()) throw new IllegalStateException("Label is empty.");
         this.label = label;
@@ -67,6 +76,12 @@ public class Setting {
             setValue(defaultValue, false);
         }
 
+        return this;
+    }
+
+    public Setting setKeyCode(int keycode) {
+        this.keyCode = keycode;
+        this.hasKeycode = true;
         return this;
     }
 

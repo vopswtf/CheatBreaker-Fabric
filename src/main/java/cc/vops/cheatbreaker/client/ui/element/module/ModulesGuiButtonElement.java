@@ -67,7 +67,9 @@ public class ModulesGuiButtonElement extends AbstractModulesGuiElement {
             f2 = this.font == Fonts.playBold22 ? -1.0f : 0.54545456f * 0.9166667f;
             if (font == Fonts.playBold18) f2 *= 2;
             if (font == Fonts.playRegular14) f2 -= 0.5f;
-            float xOffset = font == Fonts.playRegular14 ? -1f : 0f;
+
+            float xOffset = font == Fonts.playRegular14 || this.font == Fonts.playBold22 ? -1f : 0f;
+
 
             RenderUtil.drawCenteredString(
                     gui,

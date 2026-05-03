@@ -73,4 +73,9 @@ public abstract class MinecraftMixin {
             s.resize(Minecraft.getInstance().getWindow().getGuiScaledWidth(), Minecraft.getInstance().getWindow().getGuiScaledHeight());
         });
     }
+
+    @Inject(method = "destroy", at = @At("HEAD"))
+    private void onDestroy(CallbackInfo ci) {
+        CheatBreaker.getInstance().onShutdown();
+    }
 }

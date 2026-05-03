@@ -69,11 +69,36 @@ java {
     withSourcesJar()
 }
 
+def mods = ["autohotkey"]
+
+tasks.register("buildModules") {
+
+    // builda da jars
+    dependsOn(mods.collect { mod ->
+        project(":dynamic-module:${mod}").tasks.named("jar")
+    })
+
+    doLast {
+        mods.each { mod ->
+            copy {
+                from("dynamic-module/${mod}/build/libs/${mod}-1.0.jar")
+                into("run/mods")
+            }
+            println "Prepared ${mod}"
+        }
+    }
+}
+
+tasks.named("runClient") {
+    dependsOn("buildModules")
+}
+
 jar {
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }
-    dependsOn(shadowJar)
+
+    dependsOn shadowJar
 }
 
 shadowJar {

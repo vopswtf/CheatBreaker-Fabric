@@ -28,6 +28,11 @@ public abstract class AbstractModulesGuiElement {
     public abstract void handleDrawElement(GuiGraphicsExtractor gui, int mouseX, int mouseY, float partialTicks);
     public abstract void onClick(int mouseX, int mouseY, int button);
 
+    protected boolean isMouseInsideIgnoreOffset(double mouseX, double mouseY, boolean click) {
+        if (!(Minecraft.getInstance().screen instanceof CBModulesGui)) return false;
+        return mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y && mouseY <= this.y + this.height;
+    }
+
     public boolean isMouseInside(int mouseX, int mouseY, boolean click) {
         return isMouseInside(mouseX, (double) mouseY, click);
     }

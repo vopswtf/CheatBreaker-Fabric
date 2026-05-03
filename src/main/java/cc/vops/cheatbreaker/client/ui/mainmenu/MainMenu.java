@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 
 public class MainMenu extends MainMenuBase {
     private final Identifier outerLogo = CheatBreaker.asset("logo_255_outer.png");
@@ -101,12 +102,15 @@ public class MainMenu extends MainMenuBase {
         if (super.onMouseClicked(mx, my, button)) return true;
 
         if (this.singleplayerButton.isMouseInside(mx, my)) {
+            CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
             this.minecraft.setScreen(new SelectWorldScreen(this));
             return true;
         } else if (this.multiplayerButton.isMouseInside(mx, my)) {
+            CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
             this.minecraft.setScreen(new JoinMultiplayerScreen(this));
             return true;
         } else if (this.realmsButton.isMouseInside(mx, my)) {
+            CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
             this.minecraft.setScreen(new RealmsMainScreen(this));
             return true;
         }

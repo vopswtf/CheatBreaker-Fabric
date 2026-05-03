@@ -1,5 +1,6 @@
 package cc.vops.cheatbreaker.client.module;
 
+import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.audio.voicechat.VoiceChat;
 import cc.vops.cheatbreaker.client.module.type.*;
 import cc.vops.cheatbreaker.client.module.type.armorstatus.ArmorStatusModule;
@@ -32,6 +33,8 @@ public class ModuleManager {
     public VoiceChat voiceChat;
     public TeammatesModule teammatesModule;
 
+    private static final List<Class<? extends AbstractModule>> pendingRegistration = new ArrayList<>();
+
     public ModuleManager() {
         modules = new ArrayList<>();
         staffModules = new ArrayList<>();
@@ -52,6 +55,29 @@ public class ModuleManager {
         this.teammatesModule = new TeammatesModule();
 //
 //        staffModules.add(xray = new XRayModule());
+        for (Class<? extends AbstractModule> moduleClass : new ArrayList<>(pendingRegistration)) {
+            CheatBreaker.LOGGER.info("Registering Dynamic Module: {}", moduleClass.getName());
+
+            try {
+                modules.add(moduleClass.getConstructor().newInstance());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        pendingRegistration.clear();
     }
 
+    public static void registerModule(Class<? extends AbstractModule> moduleClass) {
+        if (CheatBreaker.getInstance() == null || CheatBreaker.getInstance().getModuleManager() == null) {
+            pendingRegistration.add(moduleClass);
+            return;
+        }
+
+        try {
+            AbstractModule module = moduleClass.getConstructor().newInstance();
+            CheatBreaker.getInstance().getModuleManager().modules.add(module);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

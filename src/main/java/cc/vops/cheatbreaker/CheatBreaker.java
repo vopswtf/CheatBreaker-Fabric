@@ -123,6 +123,14 @@ public class CheatBreaker implements ModInitializer {
         this.friendsManager = new FriendsManager();
     }
 
+    public void onShutdown() {
+        if (this.assetsWebSocket != null) {
+            this.assetsWebSocket.close();
+        }
+
+        configManager.writeProfile(activeProfile.getName());
+    }
+
     public static Identifier asset(String path) {
         return Identifier.fromNamespaceAndPath("cheatbreaker", path);
     }
@@ -258,6 +266,10 @@ public class CheatBreaker implements ModInitializer {
     public static float getScaleFactor() {
         int scale = Minecraft.getInstance().getWindow().getGuiScale();
         return 1f / (scale >= 4 ? 2f : scale == 3 ? 1.5f : scale == 1 ? 0.5f : 1f);
+    }
+
+    public static float getInverseScaleFactor() {
+        return 1f / getScaleFactor();
     }
 
     public static int getColor(float r, float g, float b, float a) {

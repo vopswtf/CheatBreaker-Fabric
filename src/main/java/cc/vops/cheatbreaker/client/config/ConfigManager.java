@@ -26,10 +26,6 @@ public class ConfigManager {
         profilesDir.mkdirs();
     }
 
-    // ---------------------------------------------------------------------
-    // PUBLIC API
-    // ---------------------------------------------------------------------
-
     public void write() {
         createRequiredFiles();
         writeGlobalConfig();
@@ -53,10 +49,6 @@ public class ConfigManager {
     public static File getConfigFile(String name) {
         return new File(profilesDir, name + ".json");
     }
-
-    // ---------------------------------------------------------------------
-    // GLOBAL CONFIG
-    // ---------------------------------------------------------------------
 
     private void writeGlobalConfig() {
         GlobalConfig config = new GlobalConfig();
@@ -111,10 +103,6 @@ public class ConfigManager {
         });
     }
 
-    // ---------------------------------------------------------------------
-    // PROFILE CONFIG
-    // ---------------------------------------------------------------------
-
     public void writeProfile(String profileName) {
         if (profileName.equalsIgnoreCase("default")) return;
 
@@ -134,6 +122,10 @@ public class ConfigManager {
             module.getSettingsList().forEach(s -> {
                 if (!s.getLabel().equals("label")) {
                     entry.settings.put(s.getLabel(), s.getValue());
+                }
+
+                if (s.isHasKeycode()) {
+                    entry.keybindings.put(s.getLabel(), s.getKeyCode());
                 }
             });
 
@@ -160,7 +152,10 @@ public class ConfigManager {
 
         for (AbstractModule module : CheatBreaker.getInstance().getModuleManager().modules) {
             ProfileConfig.ModuleEntry entry = config.modules.get(module.getName());
-            if (entry == null) continue;
+            if (entry == null) {
+                System.err.println("Failed to load module config! (late registration?): " + module.getName());
+                continue;
+            }
 
             module.setState(entry.state);
             module.setRenderHud(entry.renderHud);
@@ -174,13 +169,14 @@ public class ConfigManager {
                 if (s.getLabel().equals("label")) return;
                 Object value = entry.settings.get(s.getLabel());
                 if (value != null) applySetting(s, value);
+
+                if (s.isHasKeycode()) {
+                    Integer keyCode = entry.keybindings.get(s.getLabel());
+                    if (keyCode != null) s.setKeyCode(keyCode);
+                }
             });
         }
     }
-
-    // ---------------------------------------------------------------------
-    // HELPERS
-    // ---------------------------------------------------------------------
 
     private boolean createRequiredFiles() {
         try {

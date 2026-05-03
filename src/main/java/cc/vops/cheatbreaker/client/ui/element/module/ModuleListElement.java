@@ -48,41 +48,44 @@ public class ModuleListElement extends AbstractScrollableElement {
 
         for (AbstractModule object : list) {
             if (object.isStaffModule() && !object.isStaffEnabledModule()) continue;
-            ArrayList<AbstractModulesGuiElement> object2 = new ArrayList<>();
-            for (Setting cBSetting : object.getSettingsList()) {
-                switch (cBSetting.getType()) {
+            ArrayList<AbstractModulesGuiElement> elements = new ArrayList<>();
+            for (Setting setting : object.getSettingsList()) {
+                switch (setting.getType()) {
                     case BOOLEAN: {
-                        object2.add(new ToggleElement(cBSetting, f));
+                        elements.add(new ToggleElement(setting, f));
                         break;
                     }
                     case DOUBLE:
                     case INTEGER:
                     case FLOAT: {
-                        if (object.isStaffModule() && cBSetting == ((StaffModule)object).getKeybindSetting() || object.isStaffModule() && cBSetting == object.scale) break;
-                        if (cBSetting.getType().equals(Setting.Type.INTEGER) && cBSetting.getLabel().toLowerCase().contains("color")) {
-                            object2.add(new ColorPickerElement(cBSetting, f));
+                        if (object.isStaffModule() && setting == ((StaffModule)object).getKeybindSetting() || object.isStaffModule() && setting == object.scale) break;
+                        if (setting.getType().equals(Setting.Type.INTEGER) && setting.getLabel().toLowerCase().contains("color")) {
+                            elements.add(new ColorPickerElement(setting, f));
                             break;
                         }
-                        object2.add(new SliderElement(cBSetting, f));
+                        elements.add(new SliderElement(setting, f));
                         break;
                     }
                     case STRING_ARRAY: {
-                        object2.add(new ChoiceElement(cBSetting, f));
+                        elements.add(new ChoiceElement(setting, f));
                         break;
                     }
                     case STRING: {
-                        if (!cBSetting.getLabel().equalsIgnoreCase("label")) break;
-                        object2.add(new LabelElement(cBSetting, f));
+                        if (setting.isEditableString()) {
+                            elements.add(new TextFieldElement(setting, f));
+                        } else if (setting.getLabel().equalsIgnoreCase("label")) {
+                            elements.add(new LabelElement(setting, f));
+                        }
                     }
                 }
             }
 //            if (object.isStaffModule()) {
-//                object2.add(new KeybindElement(((StaffModule)object).getKeybindSetting(), f));
+//                elements.add(new KeybindElement(((StaffModule)object).getKeybindSetting(), f));
 //                if (object == CheatBreaker.getInstance().getModuleManager().xray) {
-//                    object2.add(new XRayOptionsElement(CheatBreaker.getInstance().getModuleManager().xray.lIllIllIlIIllIllIlIlIIlIl(), "Blocks", f));
+//                    elements.add(new XRayOptionsElement(CheatBreaker.getInstance().getModuleManager().xray.lIllIllIlIIllIllIlIlIIlIl(), "Blocks", f));
 //                }
 //            }
-            this.moduleElementListMap.put(object, object2);
+            this.moduleElementListMap.put(object, elements);
         }
         this.settingElement = new ArrayList<>();
         for (Setting object : CheatBreaker.getInstance().getGlobalSettings().settingsList) {
