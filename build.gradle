@@ -69,11 +69,9 @@ java {
     withSourcesJar()
 }
 
-def mods = ["autohotkey"]
-
 tasks.register("buildModules") {
+    def mods = file("dynamic-module").listFiles().findAll { it.isDirectory() }.collect { it.name }
 
-    // builda da jars
     dependsOn(mods.collect { mod ->
         project(":dynamic-module:${mod}").tasks.named("jar")
     })
