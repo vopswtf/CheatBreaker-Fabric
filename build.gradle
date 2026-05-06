@@ -29,7 +29,7 @@ dependencies {
             'io.github.jseproject:jse-spi-speex:1.1.0',
             'javazoom:jlayer:1.0.1',
             'com.google.protobuf:protobuf-java:3.25.0',
-            'com.lunarclient:apollo-protos:0.0.2',
+            'com.lunarclient:apollo-protos:+',
             'org.java-websocket:Java-WebSocket:1.6.0'
     ]
 
