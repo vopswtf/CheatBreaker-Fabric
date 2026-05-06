@@ -3,6 +3,9 @@ plugins {
     id 'maven-publish'
 }
 
+def minecraftVersion = parent.minecraft_version
+def projectVersion = parent.loader_version
+
 version = project.mod_version
 group = project.maven_group
 
@@ -32,7 +35,7 @@ repositories {
 
 dependencies {
     // To change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     implementation(project(":")) {
@@ -42,14 +45,14 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "minecraft_version", project.minecraft_version
-    inputs.property "loader_version", project.loader_version
+    inputs.property "minecraft_version", minecraftVersion
+    inputs.property "loader_version",projectVersion
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version,
-                "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version
+                "minecraft_version": minecraftVersion,
+                "loader_version":projectVersion
     }
 }
 

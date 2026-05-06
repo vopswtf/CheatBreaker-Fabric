@@ -27,6 +27,7 @@ public class KeyboardHandlerMixin {
 
         for (Setting hotkey : AutoHotKeyModule.getInstance().hotkeys) {
             if (event.key() == hotkey.getKeyCode()) {
+                // not sure if this is reliable, maybe swap with connection.sendCommand
                 if (hotkey.getAsString().startsWith("/")) {
                     minecraft.player.connection.send(new ServerboundChatCommandPacket(hotkey.getAsString().substring(1)));
                 } else {

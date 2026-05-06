@@ -7,6 +7,7 @@ public class AutoHotKeyEntry implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        // You should register any modules in onInitialize!
         ModuleManager.registerModule(AutoHotKeyModule.class);
     }
 }
