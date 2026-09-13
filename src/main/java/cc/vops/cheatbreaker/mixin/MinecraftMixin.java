@@ -50,6 +50,11 @@ public abstract class MinecraftMixin {
     private void onInit(CallbackInfo ci) {
         CheatBreaker.getInstance().onLoad();
 
+        if (CheatBreaker.getInstance().getAssetsWebSocket() == null) {
+            CheatBreaker.getInstance().connectToAssetsServer();
+        }
+        
+        SocialOverlayScreen.getInstance();
     }
 
     @Inject(method = "runTick", at = @At("TAIL"))

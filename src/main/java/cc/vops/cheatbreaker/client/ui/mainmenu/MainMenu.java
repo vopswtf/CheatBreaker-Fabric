@@ -8,6 +8,7 @@ import cc.vops.cheatbreaker.client.ui.mainmenu.element.GradientTextButton;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.Sounds;
+import cc.vops.cheatbreaker.client.util.friend.FriendsManager;
 import com.mojang.realmsclient.RealmsMainScreen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,12 +36,6 @@ public class MainMenu extends MainMenuBase {
     @Override
     protected void initMenu() {
         super.initMenu();
-
-        if (CheatBreaker.getInstance().getAssetsWebSocket() == null) {
-            CheatBreaker.getInstance().connectToAssetsServer();
-        }
-
-        SocialOverlayScreen.getInstance();
 
         this.singleplayerButton.setElementSize(this.getScaledWidth() / 2.0f - (float)50, this.getScaledHeight() / 2.0f + (float)5, (float)100, 12);
         this.multiplayerButton.setElementSize(this.getScaledWidth() / 2.0f - (float)50, this.getScaledHeight() / 2.0f + (float)24, (float)100, 12);
