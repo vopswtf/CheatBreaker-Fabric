@@ -5,7 +5,9 @@ import cc.vops.cheatbreaker.client.util.ByteBufWrapper;
 import cc.vops.cheatbreaker.client.websocket.AssetsWebSocket;
 import cc.vops.cheatbreaker.client.websocket.WSPacket;
 import cc.vops.cheatbreaker.client.websocket.client.WSPacketAuthChallengeResponse;
+import cc.vops.cheatbreaker.mixin.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ProfileKeyPairManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -27,7 +29,7 @@ public class WSPacketAuthChallenge extends WSPacket {
 
     @Override
     public void handle(AssetsWebSocket socket) {
-        Minecraft.getInstance().getProfileKeyPairManager().prepareKeyPair().whenComplete((optKey, throwable) -> {
+        ((MinecraftAccessor) Minecraft.getInstance()).getRawKPManager().prepareKeyPair().whenComplete((optKey, throwable) -> {
             if (throwable != null) {
                 throwable.printStackTrace();
                 return;
