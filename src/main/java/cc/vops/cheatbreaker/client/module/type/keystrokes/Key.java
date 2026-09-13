@@ -69,7 +69,6 @@ public class Key {
             RenderUtil.drawRect(gui, n + this.width / 2 - this.width / 8, n2 + this.height / 2, n + this.width / 2.0f + this.width / 8, n2 + this.height / 2 + 1, 0xFF000000 | (pressed ? n4 : n3));
         }
         else {
-            int width = minecraft.font.width(displayString);
             RenderUtil.drawCenteredString(
                     gui,
                     minecraft.font,

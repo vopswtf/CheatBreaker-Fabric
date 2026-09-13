@@ -30,7 +30,8 @@ public class LivingEntityRendererMixin {
         if (entity.getType() != EntityType.PLAYER) return;
 
         if (CheatBreaker.getInstance().getGlobalSettings().showSelfNametag.getAsBoolean() && entity == Minecraft.getInstance().player) {
-            cir.setReturnValue(true);
+            boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityType.TEXT_DISPLAY);
+            if (!hasDisplayRiding) cir.setReturnValue(true);
         }
     }
 

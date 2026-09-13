@@ -1,0 +1,19 @@
+{
+    "name": "Wave",
+    "duration": 2000,
+    "bones": {
+        "leftArm": {
+            "keyframes": [
+                {"time": 0, "xRot": 0, "zRot": 0, "easing": "linear"},
+                {"time": 250, "xRot": -150, "zRot": -20, "easing": "easeInOutQuad"},
+                {"time": 500, "xRot": -150, "zRot": 20, "easing": "cosinefade"},
+                {"time": 750, "xRot": -150, "zRot": -20, "easing": "cosinefade"},
+                {"time": 1000, "xRot": -150, "zRot": 20, "easing": "cosinefade"},
+                {"time": 1250, "xRot": -150, "zRot": -20, "easing": "cosinefade"},
+                {"time": 1500, "xRot": -150, "zRot": 20, "easing": "cosinefade"},
+                {"time": 1750, "xRot": -150, "zRot": -20, "easing": "cosinefade"},
+                {"time": 2000, "xRot": 0, "zRot": 0, "easing": "easeInOutQuad"}
+            ]
+        }
+    }
+}

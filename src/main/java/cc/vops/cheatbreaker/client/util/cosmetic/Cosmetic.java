@@ -33,8 +33,8 @@ public class Cosmetic {
         this.equipped = equipped;
         if (location.startsWith("https://") || location.startsWith("http://")) {
             String id = name.toLowerCase().replaceAll("[^a-z0-9]", "_");
-            this.location = AssetDownloader.getAsset(type, id, location);
-            this.previewLocation = AssetDownloader.getAsset(type, id + "_preview", location.contains("?") ? location + "&preview=true" : location + "?preview=true");
+            this.location = AssetDownloader.getAsset(type, id, location, false);
+            this.previewLocation = AssetDownloader.getAsset(type, id + "_preview", location.contains("?") ? location + "&preview=true" : location + "?preview=true", true);
         } else {
             this.location = CheatBreaker.asset(location);
             this.previewLocation = CheatBreaker.asset("preview/" + location);
@@ -51,8 +51,8 @@ public class Cosmetic {
         this.equipped = equipped;
         if (location.startsWith("https://")) {
             String id = name.toLowerCase().replaceAll("[^a-z0-9]", "_");
-            this.location = AssetDownloader.getAsset(type, id, location);
-            this.previewLocation = AssetDownloader.getAsset(type, id + "_preview", location.contains("?") ? location + "&preview=true" : location + "?preview=true");
+            this.location = AssetDownloader.getAsset(type, id, location, false);
+            this.previewLocation = AssetDownloader.getAsset(type, id + "_preview", location.contains("?") ? location + "&preview=true" : location + "?preview=true", true);
         } else {
             this.location = CheatBreaker.asset(location);
             this.previewLocation = CheatBreaker.asset("preview/" + location);

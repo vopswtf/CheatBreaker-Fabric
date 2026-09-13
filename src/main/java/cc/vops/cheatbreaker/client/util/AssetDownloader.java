@@ -16,7 +16,7 @@ import java.util.Map;
 public class AssetDownloader {
     private final static Map<Cosmetic.CosmeticType, Map<String, Identifier>> assets = new HashMap<>();
 
-    public static Identifier getAsset(Cosmetic.CosmeticType type, String id, String url) {
+    public static Identifier getAsset(Cosmetic.CosmeticType type, String id, String url, boolean silentFailure) {
         // never used
         if (type == Cosmetic.CosmeticType.CAPE && url.endsWith("preview=true")) return CheatBreaker.asset("preview_cape.png");
 
@@ -28,21 +28,22 @@ public class AssetDownloader {
                     id,
                     url,
                     loc,
-                    CheatBreaker.asset("asset_loading.png")
+                    CheatBreaker.asset("asset_loading.png"),
+                    silentFailure
             );
         }
         return loc;
     }
 
     public static class ThreadDownloadCape {
-        public ThreadDownloadCape(String assetId, String imageUrl, Identifier loc, Identifier defaultLocation) {
+        public ThreadDownloadCape(String assetId, String imageUrl, Identifier loc, Identifier defaultLocation, boolean silentFailure) {
             try {
                 InputStream defaultStream = Minecraft.getInstance().getResourceManager().open(defaultLocation);
                 Minecraft.getInstance().execute(() -> {
                     try {
                         Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(() -> assetId + " Asset", NativeImage.read(defaultStream)));
                     } catch (Exception e) {
-                        CheatBreaker.LOGGER.info("Error loading default asset: " + e.toString());
+                        CheatBreaker.LOGGER.info("Error loading default asset: " + e.toString()); // no silent here this is bad
                     }
                 });
 
@@ -51,7 +52,9 @@ public class AssetDownloader {
                         NativeImage image = NativeImage.read(imageStream);
                         Minecraft.getInstance().execute(() -> Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(() -> assetId + " Asset", image)));
                     } catch (Exception e) {
-                        CheatBreaker.LOGGER.info("Error loading asset: " + imageUrl + " - " + e);
+                        if (!silentFailure) {
+                            CheatBreaker.LOGGER.info("Error downloading asset from: " + imageUrl + " - " + e);
+                        }
                     }
                 });
                 t.setDaemon(true);

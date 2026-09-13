@@ -1,0 +1,20 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "cc.vops.overlay.mixin",
+    "compatibilityLevel": "JAVA_25",
+    "mixins": [
+    ],
+    "client": [
+        "FireHeightMixin",
+        "HideArmorGlintMixin",
+        "HideEntityArmorGlintMixin",
+        "HideItemGlintMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    },
+    "overwrites": {
+        "requireAnnotations": true
+  }
+}

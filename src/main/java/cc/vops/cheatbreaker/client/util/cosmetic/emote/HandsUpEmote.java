@@ -22,14 +22,11 @@ public class HandsUpEmote extends Emote {
         float var4 = 1.0F;
 
         if (elapsed < FADE_DURATION) {
-            // Fade in phase
             var4 = elapsed / (float) FADE_DURATION;
         } else if (remaining < FADE_DURATION) {
-            // Fade out phase
             var4 = remaining / (float) FADE_DURATION;
         }
 
-        // Clamp to 0-1
         var4 = Math.max(0.0F, Math.min(1.0F, var4));
 
         model.leftArm.xRot = (float) Math.toRadians(-180.0F * var4);

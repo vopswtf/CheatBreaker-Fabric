@@ -3,19 +3,16 @@ package cc.vops.cheatbreaker.client.util.cosmetic;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.event.type.GameTickEvent;
 import cc.vops.cheatbreaker.client.util.cosmetic.emote.*;
+import cc.vops.cheatbreaker.client.util.cosmetic.keyframe.KeyframeEmoteData;
 import com.google.common.collect.ImmutableBiMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.player.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
@@ -27,6 +24,7 @@ public class EmoteManager {
     private final List<Integer> emotes = new ArrayList<>();
     private final Map<UUID, Emote> activeEmotes = new ConcurrentHashMap<>();
 
+    private final Map<String, KeyframeEmoteData> keyframeEmoteData = new ConcurrentHashMap<>();
 
     public static final ImmutableBiMap<Integer, Class<? extends Emote>> CLIENT_EMOTES = new ImmutableBiMap.Builder<Integer, Class<? extends Emote>>()
             .put(0, WaveEmote.class)
@@ -42,6 +40,19 @@ public class EmoteManager {
     public EmoteManager() {
         emotes.addAll(CLIENT_EMOTES.keySet());
         CheatBreaker.getInstance().getEventBus().addEvent(GameTickEvent.class, this::onTick);
+
+        for (String path : List.of(
+                "emote/data/wave.json"
+        )) {
+            KeyframeEmoteData data = KeyframeEmoteData.get(CheatBreaker.asset(path));
+            if (!data.bones.isEmpty()) {
+                keyframeEmoteData.put(data.name, data);
+            }
+        }
+    }
+
+    public KeyframeEmoteData getEmoteData(String name) {
+        return keyframeEmoteData.get(name);
     }
 
     public Emote getEmoteById(int var1) {

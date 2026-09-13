@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "autohotkey",
+  "id": "overlay",
   "version": "${version}",
 
-  "name": "AutoHotkey (CB)",
+  "name": "Overlay (CB)",
   "description": "",
   "authors": [],
   "contact": {},
@@ -13,12 +13,12 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-        "cc.vops.autohotkey.AutoHotKeyEntry"
+        "cc.vops.overlay.OverlayEntry"
     ]
   },
 
   "mixins": [
-    "autohotkey.mixins.json"
+    "overlay.mixins.json"
   ],
 
   "depends": {

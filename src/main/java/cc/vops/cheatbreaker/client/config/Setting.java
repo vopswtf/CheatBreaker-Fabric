@@ -43,6 +43,9 @@ public class Setting {
     @Getter private boolean hasKeycode = false;
     @Getter @Setter private boolean allowMouseKeybinding = false;
 
+    // slider delta for arrow keys
+    @Getter private float delta = 1;
+
     public Setting(String label) {
         if (label.isEmpty()) throw new IllegalStateException("Label is empty.");
         this.label = label;
@@ -133,6 +136,11 @@ public class Setting {
     public Setting setMinMax(Number min, Number max) {
         this.minimumValue = min;
         this.maximumValue = max;
+        return this;
+    }
+
+    public Setting setDelta(float delta) {
+        this.delta = delta;
         return this;
     }
 

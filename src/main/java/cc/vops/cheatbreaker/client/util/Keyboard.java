@@ -24,6 +24,10 @@ public class Keyboard {
         return event;
     }
 
+    public static KeyEvent peekKeyEvent() {
+        return keyEvent;
+    }
+
     public static boolean isKeyDown(int key) {
         if (key < 6) {
             System.err.println("Warning: Key code " + key + " is reserved for mouse buttons. Use Mouse.isButtonDown() instead.");

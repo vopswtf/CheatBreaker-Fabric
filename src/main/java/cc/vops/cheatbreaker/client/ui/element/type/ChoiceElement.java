@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 
+import java.util.Arrays;
+
 public class ChoiceElement extends AbstractModuleTypeElement {
     private final Setting setting;
     private final Identifier leftIcon = CheatBreaker.asset("icons/left.png");
@@ -22,6 +24,11 @@ public class ChoiceElement extends AbstractModuleTypeElement {
         super(f);
         this.setting = cBSetting;
         this.height = 12;
+
+        // reset broken values
+        if (Arrays.stream(this.setting.getAcceptedValues()).noneMatch(acceptedValue -> acceptedValue.equalsIgnoreCase(this.setting.getValue().toString()))) {
+            this.setting.setValue(this.setting.getAcceptedValues()[0]);
+        }
     }
 
     private int getLongOffset() {
@@ -111,7 +118,7 @@ public class ChoiceElement extends AbstractModuleTypeElement {
 
         boolean leftHovered = (float) mouseX > (float) ((this.x - longOffset)+ this.width - 92) * this.scale && (float) mouseX < (float) (this.x - longOffset + this.width - 48) * this.scale && (float) mouseY > (float) (this.y + this.yOffset) * this.scale && (float) mouseY < (float) (this.y + 14 + this.yOffset) * this.scale;
         boolean rightHovered = (float) mouseX > (float)(this.x + this.width - 48) * this.scale && (float) mouseX < (float)(this.x + this.width - 10) * this.scale && (float) mouseY > (float)(this.y + this.yOffset) * this.scale && (float) mouseY < (float)(this.y + 14 + this.yOffset) * this.scale;
-        System.out.println("leftHovered: " + leftHovered + ", rightHovered: " + rightHovered);
+//        System.out.println("leftHovered: " + leftHovered + ", rightHovered: " + rightHovered);
 
         if ((leftHovered || rightHovered) && this.optionValueIndex == 0) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);

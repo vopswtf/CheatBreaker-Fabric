@@ -8,6 +8,7 @@ import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import org.lwjgl.glfw.GLFW;
 
 public class HorizontalSliderElement extends AbstractElement {
     @Getter
