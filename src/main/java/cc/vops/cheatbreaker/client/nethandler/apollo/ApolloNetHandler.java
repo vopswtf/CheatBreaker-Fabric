@@ -13,6 +13,7 @@ import com.lunarclient.apollo.nametag.v1.ResetNametagMessage;
 import com.lunarclient.apollo.notification.v1.DisplayNotificationMessage;
 import com.lunarclient.apollo.player.v1.EmbeddedCheckoutSupport;
 import com.lunarclient.apollo.player.v1.PlayerHandshakeMessage;
+import com.lunarclient.apollo.player.v1.UpdatePlayerWorldMessage;
 import com.lunarclient.apollo.team.v1.ResetTeamMembersMessage;
 import com.lunarclient.apollo.team.v1.UpdateTeamMembersMessage;
 import com.lunarclient.apollo.waypoint.v1.DisplayWaypointMessage;
@@ -41,6 +42,8 @@ public class ApolloNetHandler {
     private final HashMap<UUID, List<net.minecraft.network.chat.Component>> adventureNametagOverrides = new HashMap<>();
     @Setter
     private UpdateTeamMembersMessage currentTeam = null;
+    @Setter
+    private String worldName = "";
 
 
     public ApolloNetHandler() {
@@ -81,7 +84,10 @@ public class ApolloNetHandler {
                             displayWaypoint(any.unpack(DisplayWaypointMessage.class));
                         } else if (any.is(RemoveWaypointMessage.class)) {
                             removeWaypoint(any.unpack(RemoveWaypointMessage.class));
-                        } else {
+                        } else if (any.is(UpdatePlayerWorldMessage.class)) {
+                            worldName = any.unpack(UpdatePlayerWorldMessage.class).getWorld();
+                        }
+                        else {
 //                            CheatBreaker.LOGGER.info("todo: " + any.getTypeUrl());
                         }
                     } catch (Exception e) {

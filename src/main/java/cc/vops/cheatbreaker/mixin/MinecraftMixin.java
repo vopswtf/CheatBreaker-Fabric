@@ -53,7 +53,7 @@ public abstract class MinecraftMixin {
         if (CheatBreaker.getInstance().getAssetsWebSocket() == null) {
             CheatBreaker.getInstance().connectToAssetsServer();
         }
-        
+
         SocialOverlayScreen.getInstance();
     }
 

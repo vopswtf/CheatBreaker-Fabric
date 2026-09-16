@@ -9,10 +9,8 @@ import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.font.TrueTypeGlyphProvider;
 import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.*;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.CommandEncoder;
@@ -386,29 +384,40 @@ public class RenderUtil {
         );
     }
 
-    public static final RenderPipeline ICON_PIPELINE =
-            RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-                    .withLocation("pipeline/cb_icon")
-                    .withVertexShader("core/position_tex_color")
-                    .withFragmentShader("core/position_tex_color")
-                    .withSampler("Sampler0")
+    public static final RenderPipeline ARROW_PIPELINE =
+            RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET, RenderPipelines.GLOBALS_SNIPPET)
+                    .withLocation("pipeline/cb_lines")
+                    .withVertexShader("core/position_color")
+                    .withFragmentShader("core/position_color")
+                    .withColorTargetState(
+                            new ColorTargetState(BlendFunction.TRANSLUCENT)
+                    )
                     .withCull(false)
-                    .withDepthStencilState(DepthStencilState.DEFAULT)
-                    .withVertexFormat(DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS)
+                    .withVertexFormat(
+                            DefaultVertexFormat.POSITION_COLOR,
+                            VertexFormat.Mode.QUADS
+                    )
+                    .withDepthStencilState(
+                            new DepthStencilState(
+                                    CompareOp.ALWAYS_PASS,
+                                    false
+                            )
+                    )
                     .build();
 
     static {
-        RenderPipelines.register(ICON_PIPELINE);
+        RenderPipelines.register(ARROW_PIPELINE);
     }
 
-    public static RenderType icon(Identifier texture) {
-        return RenderType.create(
-                "cb_icon",
-                RenderSetup.builder(ICON_PIPELINE)
-                        .bufferSize(256)
-                        .withTexture("cheatbreaker_team_arrow", texture)
-                        .createRenderSetup()
-        );
+    private static final RenderType ARROW = RenderType.create(
+            "cb_arrow",
+            RenderSetup.builder(ARROW_PIPELINE)
+                    .bufferSize(256)
+                    .createRenderSetup()
+    );
+
+    public static RenderType arrow() {
+        return ARROW;
     }
 
     public static Identifier LOGO = CheatBreaker.asset("logo_108.png");

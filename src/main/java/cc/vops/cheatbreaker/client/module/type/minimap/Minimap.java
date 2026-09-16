@@ -183,7 +183,11 @@ public class Minimap {
 
             int textWidth = minecraft.font.width(text);
             int textHeight = minecraft.font.lineHeight;
-            graphics.fill(-(textWidth / 2) - Waypoint.displayXOffset(), -(textHeight / 2) - Waypoint.displayYOffset(), (textWidth / 2) + Waypoint.displayXOffset(), (textHeight / 2) + Waypoint.displayYOffset(), waypoint.colorInt());
+
+
+            int xOffset = Mth.floor(Waypoint.displayXOffset());
+            int yOffset = Mth.floor(Waypoint.displayYOffset());
+            graphics.fill((int) (-(textWidth / 2) - xOffset), -(textHeight / 2) - yOffset, (textWidth / 2) + xOffset, (textHeight / 2) + yOffset, waypoint.colorInt());
             graphics.text(minecraft.font, text, -(textWidth / 2), -textHeight / 2, -1, false);
             graphics.pose().popMatrix();
         }

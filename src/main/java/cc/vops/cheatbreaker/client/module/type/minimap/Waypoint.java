@@ -24,12 +24,12 @@ public record Waypoint(String dimension, double x, double y, double z, Color col
         return squaredDistTo(x, y, z) < distance * distance;
     }
 
-    public static int displayXOffset() {
-        return 2;
+    public static float displayXOffset() {
+        return 0.5f;
     }
 
-    public static int displayYOffset() {
-        return 2;
+    public static float displayYOffset() {
+        return 0.5f;
     }
 
     public int colorInt() {

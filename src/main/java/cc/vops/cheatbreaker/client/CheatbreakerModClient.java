@@ -14,6 +14,7 @@ public class CheatbreakerModClient implements ClientModInitializer {
     public static KeyMapping pushToTalk;
     public static KeyMapping dragLook;
     public static KeyMapping hideNames;
+    public static KeyMapping emoteMenu;
 
     @Override
     public void onInitializeClient() {
@@ -22,5 +23,6 @@ public class CheatbreakerModClient implements ClientModInitializer {
         openVoiceMenu = KeyMappingHelper.registerKeyMapping(new KeyMapping("Open Voice Menu", GLFW.GLFW_KEY_P, CATEGORY));
         dragLook = KeyMappingHelper.registerKeyMapping(new KeyMapping("Drag to Look", GLFW.GLFW_KEY_LEFT_ALT, CATEGORY));
         hideNames = KeyMappingHelper.registerKeyMapping(new KeyMapping("Hide Name Plates", GLFW.GLFW_KEY_H, CATEGORY));
+        emoteMenu = KeyMappingHelper.registerKeyMapping(new KeyMapping("Emote Menu", GLFW.GLFW_KEY_B, CATEGORY));
     }
 }

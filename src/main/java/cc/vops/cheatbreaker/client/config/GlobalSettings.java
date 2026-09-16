@@ -25,6 +25,7 @@ public class GlobalSettings {
     public KeyMapping pushToTalk = CheatbreakerModClient.pushToTalk;
     public KeyMapping dragLook = CheatbreakerModClient.dragLook;
     public KeyMapping hideNames = CheatbreakerModClient.hideNames;
+    public KeyMapping emoteMenu = CheatbreakerModClient.emoteMenu;
     public final List<Setting> settingsList = new ArrayList<>();
     public List<String[]> pinnedServers;
     public boolean isDebug = true;
@@ -62,6 +63,7 @@ public class GlobalSettings {
     public Setting showChatBackground;
     public Setting shinyPots;
     public Setting showSelfNametag;
+    public Setting showTeamHeads;
     public Setting showPotionInfo;
     public Setting clearGlass;
     public Setting redString;
@@ -148,6 +150,7 @@ public class GlobalSettings {
         this.enableTeamView = new Setting(this.settingsList, "Enable Team View").setValue(true);
         this.showOffScreenMarker = new Setting(this.settingsList, "Show off-screen marker").setValue(true);
         this.showDistance = new Setting(this.settingsList, "Show distance").setValue(true);
+        this.showTeamHeads = new Setting(this.settingsList, "Show teammate heads").setValue(true);
         this.generalSettingsLabel = new Setting(this.settingsList, "label").setValue("General Settings");
         this.guiBlur = new Setting(this.settingsList, "GUI Blur").setValue(false);
         this.worldTime = new Setting(this.settingsList, "World Time").setValue(-14490).setMinMax(-22880, -6100);

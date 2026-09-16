@@ -27,7 +27,7 @@ public class KeyboardHandlerMixin {
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     private void keyPress(long window, int action, KeyEvent event, CallbackInfo callbackInfo) {
         if (window == Minecraft.getInstance().getWindow().handle()) {
-            if (action == GLFW.GLFW_PRESS) {
+            if (action == GLFW.GLFW_PRESS && !Keyboard.isKeyDown(GLFW.GLFW_KEY_F3)) {
                 Keyboard.setKeyEvent(event);
                 CheatBreaker.getInstance().getEventBus().callEvent(new KeyboardEvent(event));
 
@@ -63,7 +63,7 @@ public class KeyboardHandlerMixin {
                     }
                 }
 
-                if (event.key() == GLFW.GLFW_KEY_B && !Keyboard.isKeyDown(GLFW.GLFW_KEY_F3)) { // hitboxes lol
+                if (event.key() == GlobalSettings.getKeyCode(CheatBreaker.getInstance().getGlobalSettings().emoteMenu)) { // hitboxes lol
                     if (minecraft.screen == null) {
                         minecraft.setScreen(EmoteGUI.INSTANCE != null ? EmoteGUI.INSTANCE : new EmoteGUI(event.key()));
                     }

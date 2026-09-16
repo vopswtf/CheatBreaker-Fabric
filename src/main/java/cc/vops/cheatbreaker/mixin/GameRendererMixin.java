@@ -22,18 +22,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public class GameRendererMixin {
     @Shadow @Final private Minecraft minecraft;
 
-    @Inject(
-            method = "extractGui",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/Gui;extractDeferredSubtitles()V",
-                    shift = At.Shift.AFTER
-            )
-    )
-    public void render(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci) {
-        CheatBreaker.getInstance().getModuleManager().minmap.waypointRenderer.renderNames(deltaTracker);
-    }
-
     @Inject(method = "renderLevel", at = @At("HEAD"))
     public void renderLevelHead(DeltaTracker deltaTracker, CallbackInfo ci) {
         if (CheatBreaker.getInstance().getGlobalSettings().fullBright.getAsBoolean() && minecraft.options.gamma().get() <= 1.0) {

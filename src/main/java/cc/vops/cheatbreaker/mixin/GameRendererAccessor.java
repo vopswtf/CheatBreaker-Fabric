@@ -18,9 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(GameRenderer.class)
 public interface GameRendererAccessor {
-//    @Invoker("getFov")
-//    float invokeGetFov(Camera mainCamera, float f, boolean b);
-
     @Accessor("levelProjectionMatrixBuffer")
     ProjectionMatrixBuffer getLevelProjectionMatrixBuffer();
 }
