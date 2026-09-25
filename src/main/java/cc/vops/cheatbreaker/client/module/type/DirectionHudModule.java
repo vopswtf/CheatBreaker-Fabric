@@ -13,12 +13,6 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
-//? if >=26.2 {
-import org.lwjgl.opengl.GL33C;
-//? } else {
-/*import com.mojang.blaze3d.opengl.GlStateManager;
-*///? }
-
 public class DirectionHudModule extends AbstractModule {
 
     private final Setting markerColor;
@@ -45,23 +39,11 @@ public class DirectionHudModule extends AbstractModule {
         gfx.pose().pushMatrix();
         gfx.pose().scale(CheatBreaker.getScaleFactor(), CheatBreaker.getScaleFactor());
 
-        //? if >=26.2 {
-        GL33C.glDisablei(3042, 0);
-        //? } else {
-        /*GlStateManager._enableBlend();
-        *///? }
-
         this.scaleAndTranslate(gfx);
         this.setDimensions(66, 18);
         if (!(GuiBridge.getScreen() instanceof ChatScreen) || (Boolean) this.showWhileTyping.getValue()) {
             this.render(gfx, guiDrawEvent.getDeltaTracker());
         }
-
-        //? if >=26.2 {
-        GL33C.glDisablei(3042, 0);
-        //? } else {
-        /*GlStateManager._disableBlend();
-        *///? }
 
         gfx.pose().popMatrix();
     }
