@@ -21,6 +21,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ScoreboardModule extends AbstractModule {
     public static ModuleRule rule = ModuleRule.SCOREBOARD;
@@ -144,12 +145,24 @@ public class ScoreboardModule extends AbstractModule {
         Scoreboard scoreboard = this.minecraft.level.getScoreboard();
         Objective objective = null;
         PlayerTeam playerteam = scoreboard.getPlayersTeam(this.minecraft.player.getScoreboardName());
-        if (playerteam != null) {
+
+
+//? if >=26.2 {
+        PlayerTeam playerTeam = scoreboard.getPlayersTeam(this.minecraft.player.getScoreboardName());
+        if (playerTeam != null) {
+            Optional<TeamColor> teamColor = playerTeam.getColor();
+            if (teamColor.isPresent()) {
+                objective = scoreboard.getDisplayObjective((teamColor.get()).displaySlot());
+            }
+        }
+//? } else {
+        /*if (playerteam != null) {
             DisplaySlot displayslot = DisplaySlot.teamColorToSlot(playerteam.getColor());
             if (displayslot != null) {
                 objective = scoreboard.getDisplayObjective(displayslot);
             }
         }
+*///? }
 
         return objective != null ? objective : scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR);
     }

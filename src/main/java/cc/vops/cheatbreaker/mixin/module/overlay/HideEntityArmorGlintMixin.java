@@ -1,6 +1,6 @@
-package cc.vops.overlay.mixin;
+package cc.vops.cheatbreaker.mixin.module.overlay;
 
-import cc.vops.overlay.OverlayModule;
+import cc.vops.cheatbreaker.client.module.type.OverlayModule;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import org.spongepowered.asm.mixin.Mixin;

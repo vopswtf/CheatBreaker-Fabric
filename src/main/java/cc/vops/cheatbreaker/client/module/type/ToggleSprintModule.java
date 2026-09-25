@@ -6,6 +6,7 @@ import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
 import cc.vops.cheatbreaker.client.event.type.RenderPreviewEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.module.GuiAnchor;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.KeyMapping;
@@ -96,7 +97,7 @@ public class ToggleSprintModule extends AbstractModule {
         if (!this.isRenderHud()) {
             return;
         }
-        if ((Boolean) showHudText.getValue() && ((Boolean) showWhileTyping.getValue() || !(this.minecraft.screen instanceof ChatScreen))) {
+        if ((Boolean) showHudText.getValue() && ((Boolean) showWhileTyping.getValue() || !(GuiBridge.getScreen() instanceof ChatScreen))) {
             GuiGraphicsExtractor gfx = guiDrawEvent.getGraphics();
 
             gfx.pose().pushMatrix();
@@ -160,7 +161,7 @@ public class ToggleSprintModule extends AbstractModule {
     }
 
     private void tickSneak(Minecraft client) {
-        if (client.screen != null && !(Boolean) toggleSneakInMenus.getValue()) {
+        if (GuiBridge.getScreen() != null && !(Boolean) toggleSneakInMenus.getValue()) {
             sneakToggled = false;
             wasSneakPressed = false;
             return;

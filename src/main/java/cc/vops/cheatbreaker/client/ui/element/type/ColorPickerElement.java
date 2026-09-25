@@ -51,9 +51,13 @@ public class ColorPickerElement extends AbstractModuleTypeElement {
         this.colorPickerColorElement = new ColorPickerColorElement(f, (Integer)setting.getValue());
         this.colors = new ArrayList<>();
         for (ChatFormatting value : ChatFormatting.values()) {
-            if (!value.isColor()) continue;
-            this.colors.add(new ColorPickerColorElement(f, value.getColor()));
+            if (!this.isColor(value)) continue;
+            this.colors.add(new ColorPickerColorElement(f, value.toString().charAt(1)));
         }
+    }
+
+    private boolean isColor(ChatFormatting c) {
+        return c != ChatFormatting.OBFUSCATED && c != ChatFormatting.BOLD && c != ChatFormatting.STRIKETHROUGH && c != ChatFormatting.UNDERLINE && c != ChatFormatting.ITALIC && c != ChatFormatting.RESET;
     }
 
     @Override
@@ -85,15 +89,15 @@ public class ColorPickerElement extends AbstractModuleTypeElement {
 //        CheatBreaker.getInstance().playBold18px.drawString(string, this.x + this.width - 16 - CheatBreaker.getInstance().playBold18px.getStringWidth(string), (float)(this.y + 4), bl ? -822083584 : -1358954496);
         RenderUtil.drawString(gui, Fonts.playBold18, string, this.x + this.width - 16 - Fonts.playBold18.width(string), (float)(this.y + 6), bl ? -822083584 : -1358954496);
         if (this.lIIIIllIIlIlIllIIIlIllIlI) {
-            if (this.IlllIllIlIIIIlIIlIIllIIIl && !Mouse.isButtonDown(0)) {
+            if (this.IlllIllIlIIIIlIIlIIllIIIl && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
                 this.IlllIllIlIIIIlIIlIIllIIIl = false;
                 this.lIIIIIIIIIlIllIIllIlIIlIl();
             }
-            if (this.IlIlllIIIIllIllllIllIIlIl && !Mouse.isButtonDown(0)) {
+            if (this.IlIlllIIIIllIllllIllIIlIl && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
                 this.IlIlllIIIIllIllllIllIIlIl = false;
                 this.lIIIIIIIIIlIllIIllIlIIlIl();
             }
-            if (this.llIIlllIIIIlllIllIlIlllIl && !Mouse.isButtonDown(0)) {
+            if (this.llIIlllIIIIlllIllIlIlllIl && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
                 this.llIIlllIIIIlllIllIlIlllIl = false;
                 this.lIIIIIIIIIlIllIIllIlIIlIl();
             }
@@ -122,7 +126,7 @@ public class ColorPickerElement extends AbstractModuleTypeElement {
             this.drawColorList(gui, this.colors, (int)(this.pickerX + this.pickerWidth + (float)34), (int)this.pickerY, mouseX, mouseY, (int) partialTicks);
         }
 
-        if (this.IlllIllIlIIIIlIIlIIllIIIl && Mouse.isButtonDown(0)) {
+        if (this.IlllIllIlIIIIlIIlIIllIIIl && Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
             this.IlllIllIlIIIIlIIlIIllIIIl = true;
             float relX = ((mouseX / this.scale) - this.pickerX);
             float relY = ((mouseY / this.scale) - this.pickerY - this.yOffset);
@@ -139,7 +143,7 @@ public class ColorPickerElement extends AbstractModuleTypeElement {
             float bri = Math.min(1f, Math.max(0f, 1f - (relY / (this.pickerHeight - 1f))));
             int pickedColor = Color.HSBtoRGB(this.IIIlllIIIllIllIlIIIIIIlII, sat, bri);
             this.setting.setValue(pickedColor);
-        } else if (!Mouse.isButtonDown(0)) {
+        } else if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
             // stop dragging once mouse released
             this.IlllIllIlIIIIlIIlIIllIIIl = false;
         }

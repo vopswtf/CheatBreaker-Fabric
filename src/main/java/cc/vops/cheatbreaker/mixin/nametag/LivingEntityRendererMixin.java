@@ -1,6 +1,7 @@
 package cc.vops.cheatbreaker.mixin.nametag;
 
 import cc.vops.cheatbreaker.CheatBreaker;
+import cc.vops.cheatbreaker.client.util.bridge.GameRendererBridge;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -17,7 +18,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
+
+//? if >=26.2 {
+import net.minecraft.world.entity.EntityTypes;
+//? }
 
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
@@ -27,56 +31,21 @@ public class LivingEntityRendererMixin {
             cancellable = true
     )
     private void shouldShowName(LivingEntity entity, double squaredDistanceToCamera, CallbackInfoReturnable<Boolean> cir) {
-        if (entity.getType() != EntityType.PLAYER) return;
+
+        //? if >=26.2 {
+        if (entity.getType() != EntityTypes.PLAYER) return;
+        //? } else {
+        /*if (entity.getType() != EntityType.PLAYER) return;
+        *///? }
 
         if (CheatBreaker.getInstance().getGlobalSettings().showSelfNametag.getAsBoolean() && entity == Minecraft.getInstance().player) {
-            boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityType.TEXT_DISPLAY);
+            //? if >=26.2 {
+            boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityTypes.TEXT_DISPLAY);
+            //? } else {
+            /*boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityType.TEXT_DISPLAY);
+            *///? }
+
             if (!hasDisplayRiding) cir.setReturnValue(true);
         }
-    }
-
-    @Unique
-    private void renderAdventureNametags(LivingEntity entity, double squaredDistanceToCamera, List<String> nametagLines) {
-        Minecraft minecraft = Minecraft.getInstance();
-        EntityRenderer<Entity, EntityRenderState> entityRenderer = (EntityRenderer<Entity, EntityRenderState>) minecraft.getEntityRenderDispatcher().getRenderer(entity);
-        var renderState = entityRenderer.createRenderState();
-        var cameraState = minecraft.gameRenderer.getGameRenderState().levelRenderState.cameraRenderState;
-        var levelRenderer = minecraft.levelRenderer;
-        var renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
-
-        Vec3 cameraPos = cameraState.pos;
-        double d0 = renderState.x - cameraPos.x();
-        double d1 = renderState.y - cameraPos.y();
-        double d2 = renderState.z - cameraPos.z();
-
-        PoseStack poseStack = new PoseStack();
-        Vec3 offset = entityRenderer.getRenderOffset(renderState);
-        double dd2 = d0 + offset.x();
-        double dd0 = d1 + offset.y();
-        double dd1 = d2 + offset.z();
-
-        poseStack.pushPose();
-        poseStack.translate(dd2, dd0, dd1);
-
-        for (int i = 0; i < nametagLines.size(); i++) {
-            String nametag = nametagLines.get(i);
-            poseStack.pushPose();
-            poseStack.translate(0, i, 0);
-
-            renderDispatcher.getSubmitNodeStorage().submitNameTag(
-                    poseStack,
-                    renderState.nameTagAttachment,
-                    0,
-                    Component.literal(nametag),
-                    !renderState.isDiscrete,
-                    renderState.lightCoords,
-                    renderState.distanceToCameraSq,
-                    cameraState
-            );
-
-            poseStack.popPose();
-        }
-
-        poseStack.popPose();
     }
 }

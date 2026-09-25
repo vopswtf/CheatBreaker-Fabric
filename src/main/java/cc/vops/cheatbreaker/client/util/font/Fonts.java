@@ -46,6 +46,7 @@ public final class Fonts {
 
 
     public static void reloadFonts() {
+        CheatBreaker.LOGGER.info("Reloading fonts...");
         for (Map.Entry<String, CBFontRenderer> entry : fonts.entrySet()) {
             entry.getValue().reload();
         }

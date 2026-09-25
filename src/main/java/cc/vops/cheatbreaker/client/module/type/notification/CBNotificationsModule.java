@@ -7,6 +7,7 @@ import cc.vops.cheatbreaker.client.event.type.MenuDrawEvent;
 import cc.vops.cheatbreaker.client.event.type.WindowTickEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class CBNotificationsModule extends AbstractModule
         gfx.pose().scale(CheatBreaker.getScaleFactor(), CheatBreaker.getScaleFactor());
         SocialOverlayScreen.getInstance().renderGameOverlay(gfx);
 
-        if (CheatBreaker.getInstance().getGlobalSettings().pinRadio.getAsBoolean() && !(minecraft.screen instanceof SocialOverlayScreen)) {
+        if (CheatBreaker.getInstance().getGlobalSettings().pinRadio.getAsBoolean() && !(GuiBridge.getScreen() instanceof SocialOverlayScreen)) {
             SocialOverlayScreen.getInstance().getRadioElement().drawElement(event.getGraphics(), -1, -1, true);
         }
 

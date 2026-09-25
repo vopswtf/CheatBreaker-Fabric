@@ -18,11 +18,12 @@ public class VoiceChatManager {
     private List<ClientStream> currentStreams;
     private MicrophoneRecorder recorder;
     private final Minecraft mc;
-    private final ThreadSoundQueue threadQueue;
+//    private final ThreadSoundQueue threadQueue;
     public ConcurrentLinkedQueue<Datalet> queue;
-    private final Thread threadUpdate;
+    private Thread threadUpdate;
     private final SoundDecoder decoder;
     private boolean volumeControlActive;
+    private Thread thread;
 
 
     @Setter
@@ -47,13 +48,16 @@ public class VoiceChatManager {
         this.currentStreams = new ArrayList<>();
         this.mc = Minecraft.getInstance();
         this.queue = new ConcurrentLinkedQueue<>();
-        new Thread(
-                this.threadQueue = new ThreadSoundQueue(this),
-                "Client Stream Queue"
-        ).start();
+//        this.thread = new Thread(
+//                this.threadQueue = new ThreadSoundQueue(this),
+//                "Client Stream Queue"
+//        );
+//        this.thread.setDaemon(true);
+//        this.thread.start();
         this.decoder = new SoundDecoder();
-        this.threadUpdate = new Thread(new ThreadUpdateStream(this));
-        this.threadUpdate.start();
+//        this.threadUpdate = new Thread(new ThreadUpdateStream(this));
+//        this.threadUpdate.setDaemon(true);
+//        this.threadUpdate.start();
     }
 
     public VoiceChatManager(AudioDevice microphone) {
@@ -63,13 +67,16 @@ public class VoiceChatManager {
         this.recorder = new MicrophoneRecorder(microphone);
         this.mc = Minecraft.getInstance();
         this.queue = new ConcurrentLinkedQueue<>();
-        new Thread(
-                this.threadQueue = new ThreadSoundQueue(this),
-                "Client Stream Queue"
-        ).start();
+//        this.thread = new Thread(
+//                this.threadQueue = new ThreadSoundQueue(this),
+//                "Client Stream Queue"
+//        );
+//        this.thread.setDaemon(true);
+//        this.thread.start();
         this.decoder = new SoundDecoder();
-        this.threadUpdate = new Thread(new ThreadUpdateStream(this));
-        this.threadUpdate.start();
+//        this.threadUpdate = new Thread(new ThreadUpdateStream(this));
+//        this.threadUpdate.setDaemon(true);
+//        this.threadUpdate.start();
         existent = true;
     }
 
@@ -82,18 +89,18 @@ public class VoiceChatManager {
     public void addQueue(final byte[] decoded_data, UUID uniqueId) {
         if (isExistent()) {
             this.queue.offer(new Datalet(uniqueId, decoded_data));
-            synchronized (this.threadQueue) {
-                this.threadQueue.notify();
-            }
+//            synchronized (this.threadQueue) {
+//                this.threadQueue.notify();
+//            }
         }
     }
 
     public void alertEnd(final UUID uniqueId) {
         if (isExistent()) {
             this.queue.offer(new Datalet(uniqueId, null));
-            synchronized (this.threadQueue) {
-                this.threadQueue.notify();
-            }
+//            synchronized (this.threadQueue) {
+//                this.threadQueue.notify();
+//            }
         }
     }
 

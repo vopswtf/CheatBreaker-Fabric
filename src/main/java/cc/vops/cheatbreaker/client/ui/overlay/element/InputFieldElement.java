@@ -2,16 +2,18 @@ package cc.vops.cheatbreaker.client.ui.overlay.element;
 
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.ui.mainmenu.AbstractElement;
+import cc.vops.cheatbreaker.client.ui.mainmenu.MainMenu;
 import cc.vops.cheatbreaker.client.util.ChatAllowedCharacters;
 import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.CBFontRenderer;
+import com.mojang.blaze3d.platform.InputConstants;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import org.lwjgl.glfw.GLFW;
 
 public class InputFieldElement extends AbstractElement {
     private final CBFontRenderer font;
@@ -185,87 +187,6 @@ public class InputFieldElement extends AbstractElement {
         if (!this.isFocused) {
             return;
         }
-
-        boolean ctrl = Keyboard.isCtrlKeyDown();
-        boolean shift = Keyboard.isShiftKeyDown();
-
-        switch (Character.toLowerCase(c)) {
-            case 'a':
-                if (ctrl) {
-                    this.setCursorPositionEnd();
-                    this.setSelectionPos(0);
-                    return;
-                }
-                break;
-            case 'c':
-                if (ctrl) {
-                    Minecraft.getInstance().keyboardHandler.setClipboard(this.getSelectedText());
-                    return;
-                }
-                break;
-            case 'v':
-                if (ctrl && this.isEnabled) {
-                    this.writeText(Minecraft.getInstance().keyboardHandler.getClipboard());
-                    return;
-                }
-                break;
-            case 'x':
-                if (ctrl) {
-                    Minecraft.getInstance().keyboardHandler.setClipboard(this.getSelectedText());
-                    if (this.isEnabled) {
-                        this.writeText("");
-                    }
-                    return;
-                }
-                break;
-        }
-
-        switch ((int) c) {
-            case GLFW.GLFW_KEY_BACKSPACE:
-                if (this.isEnabled) {
-                    if (ctrl) this.deleteWords(-1);
-                    else this.deleteFromCursor(-1);
-                }
-                return;
-            case GLFW.GLFW_KEY_HOME:
-                if (shift) this.setSelectionPos(0);
-                else this.setCursorPositionZero();
-                return;
-            case GLFW.GLFW_KEY_LEFT:
-                if (shift) {
-                    if (ctrl)
-                        this.setSelectionPos(this.getNthWordFromPos(-1, this.getSelectionEnd()));
-                    else
-                        this.setSelectionPos(this.getSelectionEnd() - 1);
-                } else if (ctrl) {
-                    this.setCursorPosition(this.getNthWordFromCursor(-1));
-                } else {
-                    this.moveCursorBy(-1);
-                }
-                return;
-            case GLFW.GLFW_KEY_RIGHT:
-                if (shift) {
-                    if (ctrl)
-                        this.setSelectionPos(this.getNthWordFromPos(1, this.getSelectionEnd()));
-                    else
-                        this.setSelectionPos(this.getSelectionEnd() + 1);
-                } else if (ctrl) {
-                    this.setCursorPosition(this.getNthWordFromCursor(1));
-                } else {
-                    this.moveCursorBy(1);
-                }
-                return;
-            case GLFW.GLFW_KEY_END:
-                if (shift) this.setSelectionPos(this.text.length());
-                else this.setCursorPositionEnd();
-                return;
-            case GLFW.GLFW_KEY_DELETE:
-                if (this.isEnabled) {
-                    if (ctrl) this.deleteWords(1);
-                    else this.  deleteFromCursor(1);
-                }
-                return;
-        }
         if (ChatAllowedCharacters.isAllowedCharacter(c)) {
             if (this.isEnabled) {
                 this.writeText(Character.toString(c));
@@ -280,7 +201,7 @@ public class InputFieldElement extends AbstractElement {
             this.setFocused(false);
             return true;
         }
-        if (n == 1 && this.isMouseInside(f, f2)) {
+        if (n == Mouse.MOUSE_BUTTON_RIGHT && this.isMouseInside(f, f2)) {
             this.setText("");
         }
         boolean bl3 = bl2 = f >= this.x && f < this.x + this.width && f2 >= this.y && f2 < this.y + this.height;
@@ -288,7 +209,7 @@ public class InputFieldElement extends AbstractElement {
         if (this.canLoseFocus) {
             this.setFocused(bl2);
         }
-        if (this.isFocused && n == 0) {
+        if (this.isFocused && n == Mouse.MOUSE_BUTTON_LEFT) {
             float f3 = f - this.x;
             if (this.enableBackgroundDrawing) {
                 f3 -= (float)4;
@@ -343,11 +264,11 @@ public class InputFieldElement extends AbstractElement {
             }
             if (n3 != n2) {
                 float f5 = f + (float)this.font.width(string.substring(0, n3));
-                this.drawCursorVertical(gfx, f4 + 1.5f, f2 - 3.0f, f5 + 1.5f, f2 + 1.5f + this.font.height());
+                this.drawCursorVertical(gfx, f4, f2, f5, f2 + 3f + this.font.height());
             }
         }
 
-        if (isFocused && Mouse.isButtonDown(0) || Mouse.isButtonDown(1)) {
+        if (isFocused && Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) || Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT)) {
             double mouseX = Mouse.getX() * CheatBreaker.getInverseScaleFactor();
             double mouseY = Mouse.getY() * CheatBreaker.getInverseScaleFactor();
 
@@ -498,20 +419,110 @@ public class InputFieldElement extends AbstractElement {
 
     @Override
     public void handleElementKeyTyped(int keyCode, int scanCode, int modifiers) {
-        if (Keyboard.isCtrlKeyDown()) {
-            this.textboxKeyTyped((char) keyCode, modifiers);
+        if (!this.isFocused) {
             return;
+        }
+        boolean ctrl = Keyboard.isCtrlKeyDown();
+        boolean shift = Keyboard.isShiftKeyDown();
+
+        if (ctrl) {
+            switch (keyCode) {
+                case InputConstants.KEY_A:
+                    this.setCursorPositionEnd();
+                    this.setSelectionPos(0);
+                    return;
+
+                case InputConstants.KEY_C:
+                    Minecraft.getInstance().keyboardHandler.setClipboard(this.getSelectedText());
+                    return;
+
+                case InputConstants.KEY_V:
+                    if (this.isEnabled) {
+                        this.writeText(Minecraft.getInstance().keyboardHandler.getClipboard());
+                    }
+                    return;
+
+                case InputConstants.KEY_X:
+                    Minecraft.getInstance().keyboardHandler.setClipboard(this.getSelectedText());
+
+                    if (this.isEnabled) {
+                        this.writeText("");
+                    }
+                    return;
+            }
         }
 
         switch (keyCode) {
-            case GLFW.GLFW_KEY_BACKSPACE:
-            case GLFW.GLFW_KEY_DELETE:
-            case GLFW.GLFW_KEY_HOME:
-            case GLFW.GLFW_KEY_END:
-            case GLFW.GLFW_KEY_LEFT:
-            case GLFW.GLFW_KEY_RIGHT:
-                this.textboxKeyTyped((char) keyCode, modifiers);
-                break;
+            case InputConstants.KEY_BACKSPACE:
+                if (this.isEnabled) {
+                    if (ctrl) {
+                        this.deleteWords(-1);
+                    } else {
+                        this.deleteFromCursor(-1);
+                    }
+                }
+                return;
+
+            case InputConstants.KEY_DELETE:
+                if (this.isEnabled) {
+                    if (ctrl) {
+                        this.deleteWords(1);
+                    } else {
+                        this.deleteFromCursor(1);
+                    }
+                }
+                return;
+
+            case InputConstants.KEY_HOME:
+                if (shift) {
+                    this.setSelectionPos(0);
+                } else {
+                    this.setCursorPositionZero();
+                }
+                return;
+
+            case InputConstants.KEY_END:
+                if (shift) {
+                    this.setSelectionPos(this.text.length());
+                } else {
+                    this.setCursorPositionEnd();
+                }
+                return;
+
+            case InputConstants.KEY_LEFT:
+                if (shift) {
+                    if (ctrl) {
+                        this.setSelectionPos(
+                                this.getNthWordFromPos(-1, this.getSelectionEnd())
+                        );
+                    } else {
+                        this.setSelectionPos(this.getSelectionEnd() - 1);
+                    }
+                } else if (ctrl) {
+                    this.setCursorPosition(
+                            this.getNthWordFromCursor(-1)
+                    );
+                } else {
+                    this.moveCursorBy(-1);
+                }
+                return;
+
+            case InputConstants.KEY_RIGHT:
+                if (shift) {
+                    if (ctrl) {
+                        this.setSelectionPos(
+                                this.getNthWordFromPos(1, this.getSelectionEnd())
+                        );
+                    } else {
+                        this.setSelectionPos(this.getSelectionEnd() + 1);
+                    }
+                } else if (ctrl) {
+                    this.setCursorPosition(
+                            this.getNthWordFromCursor(1)
+                    );
+                } else {
+                    this.moveCursorBy(1);
+                }
         }
     }
 }

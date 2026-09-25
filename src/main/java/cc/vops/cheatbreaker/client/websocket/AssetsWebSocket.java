@@ -291,6 +291,7 @@ public class AssetsWebSocket extends WebSocketClient {
     @Override
     public void onClose(int n, String string, boolean bl) {
         CheatBreaker.LOGGER.info("Close: " + string + " (" + n + ")");
+        if (!CheatBreaker.getInstance().isEnabled()) return;
         new WSReconnectThread().start();
         SocialOverlayScreen.getInstance().getFriendRequestsElement().getElements().clear();
         SocialOverlayScreen.getInstance().getFriendsListElement().getElements().clear();

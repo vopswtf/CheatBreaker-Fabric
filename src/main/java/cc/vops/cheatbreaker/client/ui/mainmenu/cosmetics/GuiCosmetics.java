@@ -5,6 +5,7 @@ import cc.vops.cheatbreaker.client.ui.mainmenu.MainMenu;
 import cc.vops.cheatbreaker.client.ui.mainmenu.MainMenuBase;
 import cc.vops.cheatbreaker.client.ui.mainmenu.cosmetics.element.CosmeticListElement;
 import cc.vops.cheatbreaker.client.ui.mainmenu.element.GradientTextButton;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.cosmetic.Cosmetic;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
@@ -76,7 +77,7 @@ public class GuiCosmetics extends MainMenuBase {
         super.onMouseClicked(f, f2, n);
         if (this.backButton.isMouseInside(f, f2)) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            this.mc.setScreen(new MainMenu());
+            GuiBridge.setScreen(new MainMenu());
         } else {
             int n2;
             if (this.cosmeticElements.size() > 5) {

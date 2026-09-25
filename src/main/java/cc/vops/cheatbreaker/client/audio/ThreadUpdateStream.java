@@ -1,6 +1,7 @@
 package cc.vops.cheatbreaker.client.audio;
 
 
+import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.audio.voicechat.VoiceChatManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
@@ -21,7 +22,8 @@ public class ThreadUpdateStream implements Runnable
 
     @Override
     public void run() {
-        while (true) {
+        while (CheatBreaker.getInstance().isEnabled()) {
+            if (!Minecraft.getInstance().isRunning()) return;
             if (!manager.talking.isEmpty()) {
 //                for (Map.Entry<UUID, ClientStream> entry : manager.talking.entrySet()) {
 //                    ClientStream stream = entry.getValue();

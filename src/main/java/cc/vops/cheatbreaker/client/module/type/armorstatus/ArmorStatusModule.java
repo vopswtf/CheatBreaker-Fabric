@@ -1,5 +1,7 @@
 package cc.vops.cheatbreaker.client.module.type.armorstatus;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
@@ -104,7 +106,7 @@ public class ArmorStatusModule extends AbstractModule {
         if (!this.isRenderHud()) {
             return;
         }
-        if (!(this.minecraft.screen instanceof CBModulesGui || this.minecraft.screen instanceof CBModulePlaceGui || this.minecraft.screen instanceof ChatScreen && !(Boolean) showWhileTying.getValue())) {
+        if (!(GuiBridge.getScreen() instanceof CBModulesGui || GuiBridge.getScreen() instanceof CBModulePlaceGui || GuiBridge.getScreen() instanceof ChatScreen && !(Boolean) showWhileTying.getValue())) {
             this.updateItems(this.minecraft);
             if (!items.isEmpty()) {
                 GuiGraphicsExtractor gfx = event.getGraphics();

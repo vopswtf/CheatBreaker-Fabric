@@ -1,6 +1,5 @@
 package cc.vops.cheatbreaker.client.util.font;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.Getter;
@@ -20,13 +19,20 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.UUID;
+
+//? if >=26.3 {
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+//? } else {
+/*import com.mojang.blaze3d.pipeline.RenderPipeline;
+*///? }
 
 // credit claude LOL
 public class CBFontRenderer {
 
     private static final int IMG_SIZE = 1024;
-    private static final int CHAR_COUNT = 256;
+    private static final int CHAR_COUNT = 0x0500;
     private static final int CHAR_PADDING = 8;
 
     private final CharData[] charData = new CharData[CHAR_COUNT];
@@ -60,8 +66,7 @@ public class CBFontRenderer {
     public void reload() {
         Font loaded;
         try {
-            InputStream is = Minecraft.getInstance().getResourceManager()
-                    .open(resourceLocation);
+            InputStream is = Minecraft.getInstance().getResourceManager().open(resourceLocation);
             loaded = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(size);
         } catch (Exception e) {
             loaded = new Font("Arial", Font.PLAIN, (int) size);
@@ -392,5 +397,10 @@ public class CBFontRenderer {
         private static int ensureAlpha(int color) {
             return (color & 0xFC000000) == 0 ? color | 0xFF000000 : color;
         }
+    }
+
+    public boolean canDisplay(String text) {
+        if (text == null || text.isEmpty()) return true;
+        return font != null && font.canDisplayUpTo(text) == -1;
     }
 }

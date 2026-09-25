@@ -5,6 +5,8 @@ import cc.vops.cheatbreaker.client.ui.mainmenu.element.ScrollableElement;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
 import cc.vops.cheatbreaker.client.ui.overlay.element.ElementListElement;
 import cc.vops.cheatbreaker.client.ui.overlay.element.InputFieldElement;
+import cc.vops.cheatbreaker.client.util.Mouse;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import com.google.common.collect.ImmutableList;
@@ -62,9 +64,6 @@ public class FriendsListElement extends ElementListElement<FriendElement> {
         return this.filterElement.getText().equals("") || ChatFormatting.stripFormatting(friendElement.getFriend().getName()).toLowerCase().startsWith(this.filterElement.getText().toLowerCase());
     }
 
-    /*
-     * Iterators could be improved
-     */
     @Override
     public void handleElementDraw(GuiGraphicsExtractor gfx, float f, float f2, boolean bl) {
         if (!this.friendElements.isEmpty()) {
@@ -128,7 +127,7 @@ public class FriendsListElement extends ElementListElement<FriendElement> {
     @Override
     public boolean handleElementMouseClicked(float f, float f2, int n, boolean bl) {
         this.filterElement.handleElementMouseClicked(f, f2 - this.scrollableElement.IllIIIIIIIlIlIllllIIllIII(), n, bl);
-        if (this.filterElement.isFocused() && n == 1 && this.filterElement.getText().equals("")) {
+        if (this.filterElement.isFocused() && n == Mouse.MOUSE_BUTTON_RIGHT && this.filterElement.getText().equals("")) {
             this.updateSize();
         }
         if (!bl) {

@@ -2,9 +2,8 @@ package cc.vops.cheatbreaker.client.module.type;
 
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.nethandler.apollo.ApolloNetHandler;
-import cc.vops.cheatbreaker.client.util.PlayerHeads;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
-import cc.vops.cheatbreaker.client.util.font.Fonts;
+import cc.vops.cheatbreaker.client.util.bridge.GameRendererBridge;
 import com.lunarclient.apollo.team.v1.TeamMember;
 import com.lunarclient.apollo.team.v1.UpdateTeamMembersMessage;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,15 +11,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 
 import java.awt.*;
 import java.util.UUID;
@@ -32,15 +28,16 @@ public class TeammatesModule {
             CheatBreaker.getInstance().getApolloNetHandler().getAdventureNametagOverrides().clear();
         });
 
-        LevelRenderEvents.END_MAIN.register((context) -> {
+        LevelRenderEvents.COLLECT_SUBMITS.register((context) -> {
             if (!CheatBreaker.getInstance().getApolloNetHandler().hasTeam()) return;
             UpdateTeamMembersMessage team = CheatBreaker.getInstance().getApolloNetHandler().getCurrentTeam();
 
             var mc = Minecraft.getInstance();
             if (mc.level == null || mc.player == null) return;
-            var camera = mc.gameRenderer.getGameRenderState().levelRenderState.cameraRenderState;
-            var poseStack = context.poseStack();
-            var consumers = context.bufferSource();
+            var camera = GameRendererBridge.getGameRenderState().levelRenderState.cameraRenderState;
+
+            PoseStack poseStack = context.poseStack();
+            OrderedSubmitNodeCollector collector = context.submitNodeCollector();
 
             for (TeamMember member : team.getMembersList()) {
                 if (!member.getLocation().getWorld().equals(CheatBreaker.getInstance().getApolloNetHandler().getWorldName())) {
@@ -53,20 +50,18 @@ public class TeammatesModule {
                     if (!CheatBreaker.getInstance().getGlobalSettings().showSelfNametag.getAsBoolean()) continue;
                 }
 
-                renderAbovePlayer(mc.level.getPlayerByUUID(uuid), member, camera, poseStack, consumers);
+                renderAbovePlayer(poseStack, collector, mc.level.getPlayerByUUID(uuid), member, camera);
             }
-
-            consumers.endBatch();
         });
     }
 
-    private void renderAbovePlayer(Player player, TeamMember member, CameraRenderState camera, PoseStack poseStack, MultiBufferSource.BufferSource consumers) {
+    private void renderAbovePlayer(PoseStack poseStack, OrderedSubmitNodeCollector collector, Player player, TeamMember member, CameraRenderState camera) {
+        if (Minecraft.getInstance().player == null) return;
+        if (!CheatBreaker.getInstance().getGlobalSettings().enableTeamView.getAsBoolean()) return;
         float tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
 
         double x, y, z;
-
-        float yOffset = EntityType.PLAYER.getDimensions().height() + .6f;
-        boolean showHead = CheatBreaker.getInstance().getGlobalSettings().showTeamHeads.getAsBoolean();
+        float yOffset = Minecraft.getInstance().player.getType().getDimensions().height() + .6f;
 
         if (player != null) {
             double px = Mth.lerp(tickDelta, player.xo, player.getX());
@@ -75,64 +70,49 @@ public class TeammatesModule {
             x = px - camera.pos.x;
             y = py - camera.pos.y + yOffset;
             z = pz - camera.pos.z;
-            showHead = false;
         } else {
             x = member.getLocation().getX() - camera.pos.x;
             y = member.getLocation().getY() + yOffset - camera.pos.y;
             z = member.getLocation().getZ() - camera.pos.z;
         }
 
-        poseStack.pushPose();
-        poseStack.translate(x, y, z);
-        poseStack.mulPose(Minecraft.getInstance().gameRenderer.getMainCamera().rotation());
-
         double distSq = x * x + y * y + z * z;
         double dist = Math.sqrt(distSq);
-
         float scale = (float) (0.03f * dist);
-        poseStack.scale(scale, scale, scale);
 
-        Matrix4f matrix = poseStack.last().pose();
-
-        var buffer = consumers.getBuffer(RenderUtil.arrow());
         Color color = new Color(member.getMarkerColor().getColor());
-
         float r = color.getRed() / 255f;
         float g = color.getGreen() / 255f;
         float b = color.getBlue() / 255f;
-
         float thickness = 0.4f;
 
-        addThickLine(buffer, matrix, -0.5f, 0.5f, 0.0f, 0.0f, thickness, r, g, b);
-        addThickLine(buffer, matrix, 0.0f, 0.0f, 0.5f, 0.5f, thickness, r, g, b);
+        poseStack.pushPose();
+        poseStack.translate(x, y, z);
 
-        // fix fill
-        float half = thickness / 2f;
-        float diag = half * 0.70710678f;
-        buffer.addVertex(matrix, 0f, 0f, 0).setColor(r, g, b, 1f);
-        buffer.addVertex(matrix, -diag, -diag, 0).setColor(r, g, b, 1f);
-        buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
-        buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
+//? if >=26.3 {
+        poseStack.mulPose(new Matrix4f().set(GameRendererBridge.getMainCamera().rotation()));
+//? } else {
+        /*poseStack.mulPose(GameRendererBridge.getMainCamera().rotation());
+*///? }
 
-        if (CheatBreaker.getInstance().getGlobalSettings().showTeamHeads.getAsBoolean()) {
-            // TODO
-//            UUID uuid = ApolloNetHandler.convertApolloUUID(member.getPlayerUuid());
-//            Identifier identifier = PlayerHeads.getHeadLocation(uuid.toString(), uuid);
-//
-//            RenderType renderType = RenderTypes.text(identifier);
-//            VertexConsumer headBuffer = consumers.getBuffer(renderType);
-//
-//            float headSize = 1.0f;
-//            float headHalf = headSize / 2f;
-//            float headYOffset = 0.6f;
-//
-//            headBuffer.addVertex(matrix, -headHalf, headYOffset - headHalf, 0f).setColor(255, 255, 255, 255).setUv(0f, 0f).setLight(0xF000F0);
-//            headBuffer.addVertex(matrix, -headHalf, headYOffset + headHalf, 0f).setColor(255, 255, 255, 255).setUv(0f, 1f).setLight(0xF000F0);
-//            headBuffer.addVertex(matrix,  headHalf, headYOffset + headHalf, 0f).setColor(255, 255, 255, 255).setUv(1f, 1f).setLight(0xF000F0);
-//            headBuffer.addVertex(matrix,  headHalf, headYOffset - headHalf, 0f).setColor(255, 255, 255, 255).setUv(1f, 0f).setLight(0xF000F0);
-//
-//            consumers.endBatch(renderType);
-        }
+        poseStack.scale(scale, scale, scale);
+
+        collector.submitCustomGeometry(poseStack, RenderUtil.arrow(), (pose, buffer) -> {
+            Matrix4f matrix = pose.pose();
+
+            addThickLine(buffer, matrix, -0.5f, 0.5f, 0.0f, 0.0f, thickness, r, g, b);
+            addThickLine(buffer, matrix, 0.0f, 0.0f, 0.5f, 0.5f, thickness, r, g, b);
+
+            float half = thickness / 2f;
+            float diag = half * 0.70710678f;
+            buffer.addVertex(matrix, 0f, 0f, 0).setColor(r, g, b, 1f);
+            buffer.addVertex(matrix, -diag, -diag, 0).setColor(r, g, b, 1f);
+            buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
+
+            buffer.addVertex(matrix, 0f, 0f, 0).setColor(r, g, b, 1f);
+            buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
+            buffer.addVertex(matrix, diag, diag, 0).setColor(r, g, b, 1f);
+        });
 
         poseStack.popPose();
     }

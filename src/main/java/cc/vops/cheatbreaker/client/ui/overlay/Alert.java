@@ -1,15 +1,13 @@
 package cc.vops.cheatbreaker.client.ui.overlay;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.ui.fading.AbstractFade;
 import cc.vops.cheatbreaker.client.ui.fading.FloatFade;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Alert {
     private final AbstractFade fade = new FloatFade(275L);
@@ -78,7 +76,7 @@ public class Alert {
                 RenderUtil.drawString(gfx, Fonts.playRegular16, this.lines[i], this.x + (float)4, f + (float)17 + (float)(i * 10), -1);
             }
         }
-        if (!(Minecraft.getInstance().screen instanceof SocialOverlayScreen)) {
+        if (!(GuiBridge.getScreen() instanceof SocialOverlayScreen)) {
 //            CheatBreaker.getInstance().playRegular16px.drawString("Press Shift + Tab", this.x + (float)4, f + (float) Alert.IIIIllIIllIIIIllIllIIIlIl() - (float)12, 0x6FFFFFFF);
             RenderUtil.drawString(gfx, Fonts.playRegular16, "Press Shift + Tab", this.x + (float)4, f + (float) Alert.getHeight() - (float)12, 0x6FFFFFFF);
         }

@@ -8,6 +8,7 @@ import cc.vops.cheatbreaker.client.ui.mainmenu.element.GradientTextButton;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.Sounds;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.friend.FriendsManager;
 import com.mojang.realmsclient.RealmsMainScreen;
 import net.fabricmc.loader.api.FabricLoader;
@@ -98,21 +99,21 @@ public class MainMenu extends MainMenuBase {
 
         if (this.singleplayerButton.isMouseInside(mx, my)) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            this.minecraft.setScreen(new SelectWorldScreen(this));
+            GuiBridge.setScreen(new SelectWorldScreen(this));
             return true;
         } else if (this.multiplayerButton.isMouseInside(mx, my)) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            this.minecraft.setScreen(new JoinMultiplayerScreen(this));
+            GuiBridge.setScreen(new JoinMultiplayerScreen(this));
             return true;
         } else if (this.realmsButton.isMouseInside(mx, my)) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            this.minecraft.setScreen(new RealmsMainScreen(this));
+            GuiBridge.setScreen(new RealmsMainScreen(this));
             return true;
         }
 
         // if click in bottom right in the screen and is fabric dev
         if (FabricLoader.getInstance().isDevelopmentEnvironment() && mx > this.getScaledWidth() - 50 && my > this.getScaledHeight() - 20) {
-            this.minecraft.setScreen(new GuiRenderTest());
+            GuiBridge.setScreen(new GuiRenderTest());
             return true;
         }
 

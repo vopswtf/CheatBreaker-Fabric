@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javazoom.jl.decoder.JavaLayerUtils;
 import javazoom.jl.player.Player;
+import org.lwjgl.system.linux.Stat;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -51,9 +52,11 @@ public class DashUtil {
     public static String get(String string) {
         try {
             URLConnection uRLConnection = new URL(string).openConnection();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(uRLConnection.getInputStream()));
-            String string2 = bufferedReader.readLine();
-            return string2;
+            uRLConnection.setConnectTimeout(5000);
+            uRLConnection.setReadTimeout(5000);
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(uRLConnection.getInputStream()))) {
+                return bufferedReader.readLine();
+            }
         }
         catch (Exception exception) {
             exception.printStackTrace();
@@ -62,6 +65,9 @@ public class DashUtil {
     }
 
     public static void end() {
+        if (CheatBreaker.getInstance().getRadioManager().getCurrentStation() instanceof LocalStation ls) {
+            ls.endStream();
+        }
         if (player != null) {
             player.close();
             dashPlayer.closeImpl();
@@ -71,6 +77,13 @@ public class DashUtil {
     }
 
     public static boolean isPlayerNotNull() {
+        // lol
+        if (CheatBreaker.getInstance() == null) return false;
+        if (CheatBreaker.getInstance().getRadioManager() == null) return false;
+        if (CheatBreaker.getInstance().getRadioManager().getCurrentStation() instanceof LocalStation ls) {
+            return ls.isPlaying();
+        }
+
         return player != null;
     }
 
@@ -85,13 +98,16 @@ public class DashUtil {
             player = null;
             return;
         }
+        Station station = CheatBreaker.getInstance().getRadioManager().getCurrentStation();
         new Thread(() -> {
             try {
                 URL uRL = new URL(string);
                 InputStream inputStream = uRL.openStream();
                 dashPlayer = new DashPlayer();
                 player = new Player(inputStream, dashPlayer);
-                player.play();
+                if (station == CheatBreaker.getInstance().getRadioManager().getCurrentStation()) {
+                    player.play();
+                }
             }
             catch (Exception exception) {
                 exception.printStackTrace();

@@ -8,6 +8,7 @@ import cc.vops.cheatbreaker.client.ui.element.AbstractModulesGuiElement;
 import cc.vops.cheatbreaker.client.ui.element.AbstractScrollableElement;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
 import cc.vops.cheatbreaker.client.ui.module.CBProfileCreateGui;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import net.minecraft.client.Minecraft;
@@ -65,7 +66,7 @@ public class ProfilesListElement extends AbstractScrollableElement {
         boolean bl = (float) mouseX * CheatBreaker.getScaleFactor() > (float)(this.x + this.width - 92) * this.scale && (float) mouseX * CheatBreaker.getScaleFactor() < (float)(this.x + this.width - 6) * this.scale && (float) mouseY * CheatBreaker.getScaleFactor() > (float)(this.y + this.scrollHeight - 20 + this.scrollAmount) * this.scale && (float) mouseY * CheatBreaker.getScaleFactor() < (float)(this.y + this.scrollHeight - 7 + this.scrollAmount) * this.scale;
         if (bl) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            Minecraft.getInstance().setScreen(new CBProfileCreateGui(CBModulesGui.instance,this, this.highlightColor, this.scale));
+            GuiBridge.setScreen(new CBProfileCreateGui(CBModulesGui.instance,this, this.highlightColor, this.scale));
         }
     }
 

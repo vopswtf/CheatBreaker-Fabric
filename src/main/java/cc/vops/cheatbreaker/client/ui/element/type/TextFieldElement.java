@@ -9,11 +9,11 @@ import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
 
 public class TextFieldElement extends AbstractModulesGuiElement {
     private final ModulesGuiButtonElement keybindButton;
@@ -32,7 +32,15 @@ public class TextFieldElement extends AbstractModulesGuiElement {
     }
 
     public String getKeybindText() {
-        return setting.isAllowMouseKeybinding() ? "MB" + (setting.getKeyCode() + 1) : Keyboard.getKeyName(setting.getKeyCode());
+        if (!setting.isKeyCodeSet()) {
+            return "NONE";
+        }
+
+        if (setting.isAllowMouseKeybinding() && setting.getKeyCode() < 0) {
+            return "MB " + (-setting.getKeyCode());
+        }
+
+        return Keyboard.getKeyName(setting.getKeyCode());
     }
 
     @Override
@@ -52,38 +60,45 @@ public class TextFieldElement extends AbstractModulesGuiElement {
 
         if (textInputBar.isFocused()) {
             if (Keyboard.takeCharacterEvent() instanceof CharacterEvent(int codepoint)) {
-                textInputBar.handleCharInput((char) codepoint, codepoint);
+                textInputBar.handleCharInput((char) codepoint, 0);
             } else {
-                if (Keyboard.takeKeyEvent() instanceof KeyEvent(int key, int scancode, int modifiers)) {
-                    if (key == GLFW.GLFW_KEY_ENTER) { // confirm
+                if (Keyboard.takeKeyEvent() instanceof KeyEvent keyEvent) {
+//                    System.out.println("Key event: " + keyEvent.input() + " modifiers: " + keyEvent.modifiers());
+                    if (keyEvent.input() == InputConstants.KEY_RETURN) { // confirm
                         this.setting.setValue(textInputBar.getText());
                         textInputBar.setFocused(false);
                         CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                         return;
                     }
 
-                    textInputBar.handleElementKeyTyped((char) key, scancode, modifiers);
+                    textInputBar.handleElementKeyTyped((char) keyEvent.input(), 0, keyEvent.modifiers());
                 }
             }
 
             textInputBar.handleElementUpdate();
         } else if (awaitingKeybind) {
-            if (Keyboard.takeKeyEvent() instanceof KeyEvent(int key, int scancode, int modifiers)) {
-                if (key != GLFW.GLFW_KEY_ESCAPE && key != GLFW.GLFW_KEY_DELETE && key != GLFW.GLFW_KEY_BACKSPACE) {
-                    this.setting.setKeyCode(key);
-                } else {
-                    this.setting.setKeyCode(0);
-                }
+            if (Mouse.mouseSideButton1Down) {
+                this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_SIDE1);
                 this.awaitingKeybind = false;
                 CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            } else if (Keyboard.takeCharacterEvent() instanceof CharacterEvent(int codepoint)) {
-                this.setting.setKeyCode(-codepoint);
+            } else if (Mouse.mouseSideButton2Down) {
+                this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_SIDE2);
+                this.awaitingKeybind = false;
+                CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+            }
+
+            if (Keyboard.takeKeyEvent() instanceof KeyEvent keyEvent) {
+                if (keyEvent.input() != InputConstants.KEY_RETURN && keyEvent.input() != InputConstants.KEY_DELETE && keyEvent.input() != InputConstants.KEY_BACKSPACE) {
+                    this.setting.setKeyCode(keyEvent.input());
+                } else {
+                    this.setting.setUnboundKeyCode();
+                }
                 this.awaitingKeybind = false;
                 CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
             }
 
             if (!keybindButton.isMouseInside(mouseX, mouseY, true)) {
-                if (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)) {
+                if (Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) || Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT)) {
                     this.awaitingKeybind = false;
                 }
             }

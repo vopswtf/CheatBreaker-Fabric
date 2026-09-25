@@ -4,6 +4,10 @@ import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.module.type.minimap.Waypoint;
 import com.google.gson.JsonParser;
 import com.google.protobuf.Any;
+import com.lunarclient.apollo.chat.v1.ChatButton;
+import com.lunarclient.apollo.chat.v1.DisplayChatButtonsMessage;
+import com.lunarclient.apollo.chat.v1.RemoveChatButtonMessage;
+import com.lunarclient.apollo.chat.v1.ResetChatButtonsMessage;
 import com.lunarclient.apollo.common.v1.Component;
 import com.lunarclient.apollo.common.v1.LunarClientVersion;
 import com.lunarclient.apollo.common.v1.MinecraftVersion;
@@ -31,6 +35,7 @@ import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -44,13 +49,21 @@ public class ApolloNetHandler {
     private UpdateTeamMembersMessage currentTeam = null;
     @Setter
     private String worldName = "";
+    @Getter
+    private final List<ChatButton> currentChatButtons = new ArrayList<>();
 
 
     public ApolloNetHandler() {
-        PayloadTypeRegistry.serverboundPlay().register(ApolloPayload.PACKET_TYPE, ApolloPayload.STREAM_CODEC);
-        PayloadTypeRegistry.clientboundPlay().register(ApolloPayload.PACKET_TYPE, ApolloPayload.STREAM_CODEC);
+        try {
+            PayloadTypeRegistry.serverboundPlay().register(ApolloPayload.PACKET_TYPE, ApolloPayload.STREAM_CODEC);
+            PayloadTypeRegistry.clientboundPlay().register(ApolloPayload.PACKET_TYPE, ApolloPayload.STREAM_CODEC);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            reset();
+
             PlayerHandshakeMessage handshake = PlayerHandshakeMessage.newBuilder()
                     .setMinecraftVersion(MinecraftVersion.newBuilder().setEnum("v" + SharedConstants.getCurrentVersion().id().replaceAll("\\.", "_")).build())
                     .setLunarClientVersion(LunarClientVersion.newBuilder().setGitBranch("cheatbreaker").setGitCommit(getRandomCommit()).setSemver(CheatBreaker.getVersion()).build())
@@ -86,6 +99,14 @@ public class ApolloNetHandler {
                             removeWaypoint(any.unpack(RemoveWaypointMessage.class));
                         } else if (any.is(UpdatePlayerWorldMessage.class)) {
                             worldName = any.unpack(UpdatePlayerWorldMessage.class).getWorld();
+                        } else if (any.is(DisplayChatButtonsMessage.class)) {
+                            currentChatButtons.clear();
+                            currentChatButtons.addAll(any.unpack(DisplayChatButtonsMessage.class).getChatButtonsList());
+                        } else if (any.is(RemoveChatButtonMessage.class)) {
+                            RemoveChatButtonMessage msg = any.unpack(RemoveChatButtonMessage.class);
+                            currentChatButtons.removeIf(button -> button.hasButton() && button.getButton().getId().equals(msg.getId()));
+                        } else if (any.is(ResetChatButtonsMessage.class)) {
+                            currentChatButtons.clear();
                         }
                         else {
 //                            CheatBreaker.LOGGER.info("todo: " + any.getTypeUrl());
@@ -95,6 +116,14 @@ public class ApolloNetHandler {
                     }
                 }
         );
+    }
+
+    public void reset() {
+        System.out.println("ApolloNetHandler reset");
+        this.adventureNametagOverrides.clear();
+        this.currentTeam = null;
+        this.worldName = "";
+        this.currentChatButtons.clear();
     }
 
     // lol

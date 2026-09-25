@@ -8,15 +8,17 @@ import cc.vops.cheatbreaker.client.ui.overlay.element.ElementListElement;
 import cc.vops.cheatbreaker.client.ui.overlay.element.FlatButtonElement;
 import cc.vops.cheatbreaker.client.ui.overlay.element.InputFieldElement;
 import cc.vops.cheatbreaker.client.util.ChatColor;
+import cc.vops.cheatbreaker.client.util.Mouse;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.websocket.client.WSPacketClientRequestsStatus;
 import cc.vops.cheatbreaker.client.websocket.shared.WSPacketFriendRequest;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +148,7 @@ public class FriendRequestListElement extends ElementListElement<FriendRequestEl
         this.toggleRequests.handleElementKeyTyped(keyCode, scanCode, modifiers);
         this.addButton.handleElementKeyTyped(keyCode, scanCode, modifiers);
         this.scrollableElement.handleElementKeyTyped(keyCode, scanCode, modifiers);
-        if (this.username.isFocused() && keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (this.username.isFocused() && keyCode == InputConstants.KEY_RETURN) {
             this.lIIlIlIllIIlIIIlIIIlllIII();
         }
         this.setElementSize(this.x, this.y, this.width, this.height);
@@ -156,7 +158,7 @@ public class FriendRequestListElement extends ElementListElement<FriendRequestEl
     public boolean handleElementMouseClicked(float f, float f2, int n, boolean bl) {
         this.filter.handleElementMouseClicked(f, f2 - this.scrollableElement.IllIIIIIIIlIlIllllIIllIII(), n, bl);
         this.username.handleElementMouseClicked(f, f2 - this.scrollableElement.IllIIIIIIIlIlIllllIIllIII(), n, bl);
-        if (this.filter.isFocused() && n == 1 && this.filter.getText().equals("")) {
+        if (this.filter.isFocused() && n == Mouse.MOUSE_BUTTON_RIGHT && this.filter.getText().equals("")) {
             this.resetSize();
         }
         if (!bl) {

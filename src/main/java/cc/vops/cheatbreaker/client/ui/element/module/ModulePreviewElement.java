@@ -7,6 +7,7 @@ import cc.vops.cheatbreaker.client.ui.element.AbstractModulesGuiElement;
 import cc.vops.cheatbreaker.client.ui.element.AbstractScrollableElement;
 import cc.vops.cheatbreaker.client.ui.module.CBModulePlaceGui;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.CBFontRenderer;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
@@ -143,7 +144,7 @@ public class ModulePreviewElement extends AbstractModulesGuiElement {
                 if (this.module.getGuiAnchor() == null) {
                     this.module.setState(true);
                 } else {
-                    Minecraft.getInstance().setScreen(new CBModulePlaceGui(CBModulesGui.instance, this.module));
+                    GuiBridge.setScreen(new CBModulePlaceGui(CBModulesGui.instance, this.module));
                 }
             } else {
                 this.module.setRenderHud(!this.module.isRenderHud());
@@ -152,7 +153,7 @@ public class ModulePreviewElement extends AbstractModulesGuiElement {
                     if (this.module.getGuiAnchor() == null) {
                         this.module.setState(true);
                     } else {
-                        Minecraft.getInstance().setScreen(new CBModulePlaceGui(CBModulesGui.instance, this.module));
+                        GuiBridge.setScreen(new CBModulePlaceGui(CBModulesGui.instance, this.module));
                     }
                 } else if (this.module.isEditable && this.module.isEnabled()) {
                     this.module.setState(false);

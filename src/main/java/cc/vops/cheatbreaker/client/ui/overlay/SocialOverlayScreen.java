@@ -12,6 +12,7 @@ import cc.vops.cheatbreaker.client.util.*;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.friend.Friend;
 import cc.vops.cheatbreaker.client.util.friend.Status;
+import com.mojang.blaze3d.platform.InputConstants;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,7 +20,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
@@ -229,7 +229,7 @@ public class SocialOverlayScreen extends AbstractGui {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (event.key() == GLFW.GLFW_KEY_GRAVE_ACCENT && CheatBreaker.getInstance().isConsoleAllowed()) {
+        if (event.key() == InputConstants.KEY_GRAVE && CheatBreaker.getInstance().isConsoleAllowed()) {
             boolean shouldOpen = true;
             for (AbstractElement element : this.elements) {
                 if (!(element instanceof ConsoleElement)) continue;

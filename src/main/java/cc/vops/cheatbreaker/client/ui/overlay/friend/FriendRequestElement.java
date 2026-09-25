@@ -33,7 +33,7 @@ public class FriendRequestElement extends AbstractElement {
         if (this.friendRequest.isFriend()) {
             boolean cancelHovered = mouseX > this.x + (float)24 && mouseX < this.x + (float)52 && mouseY < this.y + this.height && mouseY > this.y + (float)10 && bl;
 //            CheatBreaker.getInstance().playRegular14px.drawString("CANCEL", this.x + (float)24, this.y + (float)11, cancelHovered ? -52429 : 0x7FFF3333);
-            RenderUtil.drawString(gfx, Fonts.playRegular14, "CANCEL", this.x + (float)24, this.y + (float)11, cancelHovered ? -52429 : 0x7FFF3333);
+            RenderUtil.drawString(gfx, Fonts.playRegular14, "CANCEL", this.x + (float)24, this.y + (float)13, cancelHovered ? -52429 : 0x7FFF3333);
         } else {
             boolean acceptHovered = mouseX > this.x + (float)24 && mouseX < this.x + (float)52 && mouseY < this.y + this.height && mouseY > this.y + (float)10 && bl;
             boolean denyHovered = mouseX > this.x + (float)52 && mouseX < this.x + (float)84 && mouseY < this.y + this.height && mouseY > this.y + (float)10 && bl;

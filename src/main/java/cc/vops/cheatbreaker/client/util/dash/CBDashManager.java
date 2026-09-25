@@ -1,22 +1,31 @@
 package cc.vops.cheatbreaker.client.util.dash;
 
-import java.util.List;
+import lombok.Getter;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+@Getter
 public class CBDashManager {
 
-    private final List<Station> stations = DashUtil.get();
+    private final List<Station> stations = new CopyOnWriteArrayList<>();
     private final DashQueueThread dashQueueThread = new DashQueueThread();
     private final DashThread dashThread;
     private Station station;
+    private final LocalStation localStation = new LocalStation();
 
     public CBDashManager() {
+        this.dashQueueThread.setDaemon(true);
         this.dashQueueThread.start();
+        this.stations.addFirst(this.localStation);
+        this.station = this.localStation;
         this.dashThread = new DashThread();
+        this.dashThread.setDaemon(true);
         this.dashThread.start();
-        if (!this.stations.isEmpty()) {
-            this.station = this.stations.getFirst();
-            this.dashQueueThread.offerStation(this.station);
-        }
+        this.dashQueueThread.offerStation(this.station);
+
+        CompletableFuture.supplyAsync(DashUtil::get).thenAccept(stations::addAll);
     }
 
     public void setStation(Station station) {

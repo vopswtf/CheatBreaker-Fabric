@@ -5,6 +5,7 @@ import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
 import cc.vops.cheatbreaker.client.event.type.RenderPreviewEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.module.GuiAnchor;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.mixin.module.bossbar.BossBarAccessor;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.LerpingBossEvent;
@@ -28,7 +29,7 @@ public class BossBarModule extends AbstractModule {
     }
 
     public void renderPreview(RenderPreviewEvent event) {
-        if (!((BossBarAccessor) minecraft.gui.getBossOverlay()).getEvents().isEmpty()) return;
+        if (!((BossBarAccessor) GuiBridge.getBossOverlay()).getEvents().isEmpty()) return;
         GuiGraphicsExtractor gfx = event.getGraphics();
 //        GL11.glPushMatrix();
         gfx.pose().pushMatrix();
@@ -63,7 +64,7 @@ public class BossBarModule extends AbstractModule {
     }
 
     public void renderReal(GuiDrawEvent event) {
-        if (((BossBarAccessor) minecraft.gui.getBossOverlay()).getEvents().isEmpty()) return;
+        if (((BossBarAccessor) GuiBridge.getBossOverlay()).getEvents().isEmpty()) return;
         GuiGraphicsExtractor gfx = event.getGraphics();
         gfx.pose().pushMatrix();
 
@@ -75,7 +76,7 @@ public class BossBarModule extends AbstractModule {
         int i = gfx.guiWidth();
         int j = 12;
 
-        for (LerpingBossEvent lerpingbossevent : ((BossBarAccessor) minecraft.gui.getBossOverlay()).getEvents().values()) {
+        for (LerpingBossEvent lerpingbossevent : ((BossBarAccessor) GuiBridge.getBossOverlay()).getEvents().values()) {
             this.drawBar(gfx, 0, j, lerpingbossevent);
             Component component = lerpingbossevent.getName();
             int l = this.minecraft.font.width(component);

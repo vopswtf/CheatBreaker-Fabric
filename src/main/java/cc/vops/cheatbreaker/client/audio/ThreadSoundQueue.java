@@ -1,6 +1,8 @@
 package cc.vops.cheatbreaker.client.audio;
 
+import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.audio.voicechat.VoiceChatManager;
+import net.minecraft.client.Minecraft;
 
 public class ThreadSoundQueue implements Runnable
 {
@@ -14,7 +16,7 @@ public class ThreadSoundQueue implements Runnable
 
     @Override
     public void run() {
-        while (true) {
+        while (CheatBreaker.getInstance().isEnabled()) {
             if (!this.sndManager.queue.isEmpty()) {
 //                final Datalet data = this.sndManager.queue.poll();
 //                if (data == null) {
@@ -37,8 +39,9 @@ public class ThreadSoundQueue implements Runnable
                         this.wait();
                     }
                 }
-                catch (Exception e) {
-                    e.printStackTrace();
+                catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }

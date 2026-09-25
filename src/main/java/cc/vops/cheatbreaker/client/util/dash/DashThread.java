@@ -1,6 +1,9 @@
 package cc.vops.cheatbreaker.client.util.dash;
 
 import cc.vops.cheatbreaker.CheatBreaker;
+import lombok.Setter;
+import net.minecraft.client.Minecraft;
+import org.endlesssource.mediainterface.SystemMediaFactory;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -8,15 +11,29 @@ import java.time.LocalDateTime;
 public class DashThread extends Thread {
     @Override
     public void run() {
-        while (true) {
+        while (CheatBreaker.getInstance().isEnabled()) {
             try {
                 while (true) {
-                    if (CheatBreaker.getInstance().getRadioManager().getCurrentStation() != null
-                            && Station.getStartTime() != null &&
-                            (Duration.between(Station.getStartTime(), LocalDateTime.now()).toMillis() / 1000L) >= (long)(CheatBreaker.getInstance().getRadioManager().getCurrentStation().getDuration() + 2)) {
+                    if (!Minecraft.getInstance().isRunning()) return;
+                    if (CheatBreaker.getInstance().getRadioManager() == null) continue;
+                    if (CheatBreaker.getInstance().getRadioManager().getLocalStation() instanceof LocalStation ls) {
+                        if (ls.getMedia() == null) {
+                            try {
+                                ls.setMedia(SystemMediaFactory.createSystemInterface());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
 
-                        CheatBreaker.getInstance().getRadioManager().getCurrentStation().getData();
-                        Thread.sleep(4000L);
+                    Station current = CheatBreaker.getInstance().getRadioManager().getCurrentStation();
+                    if (current != null) {
+                        if (current instanceof LocalStation) {
+                            current.getData();
+                        } else if(Station.getStartTime() != null && (Duration.between(Station.getStartTime(), LocalDateTime.now()).toMillis() / 1000L) >= (long)(current.getDuration() + 2)) {
+                            current.getData();
+                            Thread.sleep(4000L);
+                        }
                     }
                     Thread.sleep(1000L);
                 }

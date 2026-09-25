@@ -8,7 +8,6 @@ import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import org.lwjgl.glfw.GLFW;
 
 public class HorizontalSliderElement extends AbstractElement {
     @Getter
@@ -41,7 +40,7 @@ public class HorizontalSliderElement extends AbstractElement {
         if (!bl) {
             return false;
         }
-        if (Mouse.isButtonDown(0) && this.isMouseInside(f, f2)) {
+        if (Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) && this.isMouseInside(f, f2)) {
             this.fadeTime.reset();
             this.value = (Number)this.setting.getValue();
             float f3 = ((Number)this.setting.getMinimumValue()).floatValue();

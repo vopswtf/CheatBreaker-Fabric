@@ -1,5 +1,7 @@
 package cc.vops.cheatbreaker.client.module.type;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
@@ -59,7 +61,7 @@ public class CoordinatesModule extends AbstractModule {
         int n2 = (int) this.minecraft.player.getBoundingBox().minY;
         int n3 = Mth.floor(this.minecraft.player.position().z);
 
-        if (!(this.minecraft.screen instanceof ChatScreen) || ((Boolean) this.showWhileTyping.getValue())) {
+        if (!(GuiBridge.getScreen() instanceof ChatScreen) || ((Boolean) this.showWhileTyping.getValue())) {
             int n4;
             String object;
             float f = 4;

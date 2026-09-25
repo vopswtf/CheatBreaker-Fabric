@@ -1,10 +1,12 @@
 package cc.vops.cheatbreaker.mixin;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GameRendererBridge;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.LogoTexture;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screens.Overlay;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -88,10 +90,10 @@ public class LoadingOverlayMixin {
         float f1 = this.fadeInStart > -1L ? (float)(k - this.fadeInStart) / 500.0F : -1.0F;
         float f2;
         if (f >= 1.0F) {
-            if (this.minecraft.screen != null) {
-                this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(p_281839_, 0, 0, p_283394_);
+            if (GuiBridge.getScreen() != null) {
+                GuiBridge.getScreen().extractRenderStateWithTooltipAndSubtitles(p_281839_, 0, 0, p_283394_);
             } else {
-                this.minecraft.gui.extractDeferredSubtitles();
+                GuiBridge.extractDeferredSubtitles();
             }
 
             int l = Mth.ceil((1.0F - Mth.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
@@ -99,10 +101,10 @@ public class LoadingOverlayMixin {
             p_281839_.fill(0, 0, i, j, replaceAlpha(BRAND_BACKGROUND.getAsInt(), l));
             f2 = 1.0F - Mth.clamp(f - 1.0F, 0.0F, 1.0F);
         } else if (this.fadeIn) {
-            if (this.minecraft.screen != null && f1 < 1.0F) {
-                this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(p_281839_, p_282704_, p_283650_, p_283394_);
+            if (GuiBridge.getScreen() != null && f1 < 1.0F) {
+                GuiBridge.getScreen().extractRenderStateWithTooltipAndSubtitles(p_281839_, p_282704_, p_283650_, p_283394_);
             } else {
-                this.minecraft.gui.extractDeferredSubtitles();
+                GuiBridge.extractDeferredSubtitles();
             }
 
             int j2 = Mth.ceil(Mth.clamp(f1, 0.15, 1.0) * 255.0);
@@ -110,7 +112,12 @@ public class LoadingOverlayMixin {
             p_281839_.fill(0, 0, i, j, replaceAlpha(BRAND_BACKGROUND.getAsInt(), j2));
             f2 = Mth.clamp(f1, 0.0F, 1.0F);
         } else {
-            this.minecraft.gameRenderer.getGameRenderState().guiRenderState.clearColorOverride = BRAND_BACKGROUND.getAsInt();
+
+            //? if >=26.2 {
+            ARGB.setVector4fFromARGB32(this.minecraft.gameRenderer.gameRenderState().guiRenderState.clearColorOverride, BRAND_BACKGROUND.getAsInt());
+            //? } else {
+            /*GameRendererBridge.getGameRenderState().guiRenderState.clearColorOverride = BRAND_BACKGROUND.getAsInt();
+            *///? }
             f2 = 1.0F;
         }
 
@@ -140,22 +147,20 @@ public class LoadingOverlayMixin {
         int i2 = (int)(p_281839_.guiHeight() * 0.8325);
         float f3 = this.reload.getActualProgress();
         this.currentProgress = Mth.clamp(this.currentProgress * 0.95F + f3 * 0.050000012F, 0.0F, 1.0F);
-        if (f < 1.0F) {
+        if (f > 0 && f < 1.0F) {
             this.drawProgressBar(p_281839_, i / 2 - k1, i2 - 5, i / 2 + k1, i2 + 5, 1.0F - Mth.clamp(f, 0.0F, 1.0F));
-        } else if (!reloaded) {
-            Fonts.reloadFonts();
-            reloaded = true;
         }
 
         if (f >= 2.0F) {
-            this.minecraft.setOverlay(null);
+            GuiBridge.setOverlay(null);
         }
     }
 
 
     @Unique
     private void drawProgressBar(GuiGraphicsExtractor p_283125_, int p_96184_, int p_96185_, int p_96186_, int p_96187_, float p_96188_) {
-        int i = Mth.ceil((p_96186_ - p_96184_ - 2) * this.currentProgress);
+        int w = p_96186_ - p_96184_ - 2;
+        int i = Mth.clamp(Mth.ceil(w * this.currentProgress), 0, w);
         int j = Math.round(p_96188_ * 255.0F);
         int k = -2473389;
 

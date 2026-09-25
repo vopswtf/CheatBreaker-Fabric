@@ -8,9 +8,11 @@ import net.minecraft.resources.Identifier;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 public class ImageDownloader {
@@ -24,7 +26,6 @@ public class ImageDownloader {
         );
 
         if (!textures.containsKey(id)) {
-            // Create tiny placeholder just to register something
             DynamicTexture placeholder = new DynamicTexture(() -> id, new NativeImage(1, 1, false));
             textures.put(id, placeholder);
             Minecraft.getInstance().getTextureManager().register(loc, placeholder);
@@ -48,17 +49,12 @@ public class ImageDownloader {
 
         @Override
         public void run() {
-            try (InputStream in = URI.create(url).toURL().openStream()) {
-
-                // decode ANY image type (PNG/JPG/GIF/BMP)
+            try (InputStream in = inputStream(url)) {
                 NativeImage img = readAnyImage(in);
 
-                // Must register NEW DynamicTexture with correct dimensions
                 Minecraft.getInstance().execute(() -> {
                     DynamicTexture newTex = new DynamicTexture(() -> id, img);
                     textures.put(id, newTex);
-
-                    // re-register with the SAME Identifier
                     Minecraft.getInstance().getTextureManager().register(location, newTex);
                 });
 
@@ -68,7 +64,28 @@ public class ImageDownloader {
         }
     }
 
-    // BufferedImage → NativeImage converter
+    private static InputStream inputStream(String source) throws IOException {
+        if (source == null || source.isBlank()) throw new IOException("Empty image source");
+
+        if (source.startsWith("http://") || source.startsWith("https://")) {
+            return URI.create(source).toURL().openStream();
+        }
+
+        // assuming b64 here
+        if (source.startsWith("data:image/")) {
+            int comma = source.indexOf(',');
+            if (comma == -1) throw new IOException("Invalid data string");
+            source = source.substring(comma + 1);
+        }
+
+        try {
+            byte[] bytes = Base64.getDecoder().decode(source);
+            return new ByteArrayInputStream(bytes);
+        } catch (IllegalArgumentException e) {
+            throw new IOException("not real wtf", e);
+        }
+    }
+
     private static NativeImage readAnyImage(InputStream in) throws IOException {
         BufferedImage src = ImageIO.read(in);
         if (src == null) {

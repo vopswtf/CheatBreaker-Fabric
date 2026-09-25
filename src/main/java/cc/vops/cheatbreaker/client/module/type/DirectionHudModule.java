@@ -1,18 +1,23 @@
 package cc.vops.cheatbreaker.client.module.type;
 
-
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.module.GuiAnchor;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
-import com.mojang.blaze3d.opengl.GlStateManager;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+
+//? if >=26.2 {
+import org.lwjgl.opengl.GL33C;
+//? } else {
+/*import com.mojang.blaze3d.opengl.GlStateManager;
+*///? }
 
 public class DirectionHudModule extends AbstractModule {
 
@@ -39,13 +44,25 @@ public class DirectionHudModule extends AbstractModule {
         GuiGraphicsExtractor gfx = guiDrawEvent.getGraphics();
         gfx.pose().pushMatrix();
         gfx.pose().scale(CheatBreaker.getScaleFactor(), CheatBreaker.getScaleFactor());
-        GlStateManager._enableBlend();
+
+        //? if >=26.2 {
+        GL33C.glDisablei(3042, 0);
+        //? } else {
+        /*GlStateManager._enableBlend();
+        *///? }
+
         this.scaleAndTranslate(gfx);
         this.setDimensions(66, 18);
-        if (!(minecraft.screen instanceof ChatScreen) || (Boolean) this.showWhileTyping.getValue()) {
+        if (!(GuiBridge.getScreen() instanceof ChatScreen) || (Boolean) this.showWhileTyping.getValue()) {
             this.render(gfx, guiDrawEvent.getDeltaTracker());
         }
-        GlStateManager._disableBlend();
+
+        //? if >=26.2 {
+        GL33C.glDisablei(3042, 0);
+        //? } else {
+        /*GlStateManager._disableBlend();
+        *///? }
+
         gfx.pose().popMatrix();
     }
 

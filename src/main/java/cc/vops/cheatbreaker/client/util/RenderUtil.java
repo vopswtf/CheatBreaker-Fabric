@@ -5,52 +5,31 @@ import cc.vops.cheatbreaker.client.util.font.CBFontRenderer;
 import cc.vops.cheatbreaker.client.util.render.*;
 import cc.vops.cheatbreaker.mixin.FontAccessor;
 import cc.vops.cheatbreaker.mixin.TTFAccessor;
-import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.font.TrueTypeGlyphProvider;
-import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.*;
-import com.mojang.blaze3d.platform.CompareOp;
-import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.CommandEncoder;
-import com.mojang.blaze3d.systems.RenderPass;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.renderer.state.gui.BlitRenderState;
-import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.client.renderer.DynamicUniforms;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.ReloadableTexture;
-import net.minecraft.client.renderer.texture.TextureContents;
-import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceProvider;
-import net.minecraft.util.ARGB;
-import net.minecraft.util.Mth;
-import org.jetbrains.annotations.NotNull;
 import org.joml.*;
-import org.lwjgl.opengl.GL11;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.Math;
-import java.util.Base64;
-import java.util.List;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+
+//? if >= 26.3 {
+import com.mojang.renderpearl.api.pipeline.*;
+//? } else {
+/*import com.mojang.blaze3d.platform.CompareOp;
+*///? }
+
+//? if 26.2 {
+/*import com.mojang.blaze3d.PrimitiveTopology;
+*///? }
 
 public class RenderUtil {
     public static void drawTexturedModalRect(GuiGraphicsExtractor gfx, Identifier texture, float x, float y, float u, float v, int width, int height, int color) {
@@ -172,6 +151,18 @@ public class RenderUtil {
         );
     }
 
+    public static void drawRoundedRect(GuiGraphicsExtractor gfx, RenderPipeline pipeline, double x1, double y1, double x2, double y2, double radius, int color) {
+        gfx.guiRenderState.addGuiElement(
+                new RoundedRectRenderState(
+                        gfx.pose(),
+                        gfx.scissorStack.peek(),
+                        (float)x1, (float)y1, (float)x2, (float)y2,
+                        color,
+                        radius / 2
+                )
+        );
+    }
+
     public static void drawGradientRect(GuiGraphicsExtractor gfx, double x1, double y1, double x2, double y2, int topColor, int bottomColor) {
         gfx.guiRenderState.addGuiElement(
                 new GradientRectRenderState(
@@ -254,6 +245,40 @@ public class RenderUtil {
         gfx.text(font, string, (int)x, (int)y, color, true);
     }
 
+    // mc component
+    public static void drawCenteredString(GuiGraphicsExtractor gfx, Font font, Component component, int i, int j, int k) {
+        if (isFontUnloaded(font)) return;
+        gfx.text(font, component, i - font.width(component) / 2, j, k, false);
+    }
+
+    public static void drawCenteredString(GuiGraphicsExtractor gfx, Font font, Component component, float i, float j, int k) {
+        if (isFontUnloaded(font)) return;
+        gfx.pose().pushMatrix();
+        gfx.pose().translate((i - (int)i), (j - (int)j));
+        gfx.text(font, component, (int)i - font.width(component) / 2, (int)j, k, false);
+        gfx.pose().popMatrix();
+    }
+
+    public static void drawCenteredStringWithShadow(GuiGraphicsExtractor gfx, Font font, Component component, int i, int j, int k) {
+        if (isFontUnloaded(font)) return;
+        gfx.text(font, component, i - font.width(component) / 2, j, k, true);
+    }
+
+    public static void drawString(GuiGraphicsExtractor gfx, Font font, Component component, int i, int j, int k) {
+        if (isFontUnloaded(font)) return;
+        gfx.text(font, component, i, j, k, false);
+    }
+
+    public static void drawString(GuiGraphicsExtractor gfx, Font font, Component component, float i, float j, int k) {
+        if (isFontUnloaded(font)) return;
+        gfx.text(font, component, (int)i, (int)j, k, false);
+    }
+
+    public static void drawStringWithShadow(GuiGraphicsExtractor gfx, Font font, Component component, float x, float y, int color) {
+        if (isFontUnloaded(font)) return;
+        gfx.text(font, component, (int)x, (int)y, color, true);
+    }
+
     // CB Font Rendering
     public static void drawCenteredString(GuiGraphicsExtractor gfx, CBFontRenderer font, String string, float i, float j, int k) {
         font.drawCenteredString(gfx, string, i, j, k);
@@ -294,16 +319,6 @@ public class RenderUtil {
     }
 
     public static void drawIcon(GuiGraphicsExtractor gfx, Identifier texture, float x, float y, float width, float height) {
-//        gfx.blit(
-//                RenderPipelines.GUI_TEXTURED,
-//                texture,
-//                (int) x, (int) y,
-//                0f, 0f,
-//                (int) width, (int) height,
-//                (int) width, (int) height,
-//                (int) width, (int) height,
-//                -1
-//        );
         AbstractTexture tex = Minecraft.getInstance().getTextureManager().getTexture(texture);
 
         gfx.guiRenderState.addGuiElement(new FloatBlitRenderState(
@@ -384,7 +399,30 @@ public class RenderUtil {
         );
     }
 
+    //? if >=26.2 {
     public static final RenderPipeline ARROW_PIPELINE =
+            RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+                    .withLocation("pipeline/cb_lines")
+                    .withVertexShader("core/position_color")
+                    .withFragmentShader("core/position_color")
+                    .withColorTargetState(
+                            new ColorTargetState(BlendFunction.TRANSLUCENT)
+                    )
+                    .withCull(false)
+                    .withVertexBinding(
+                            0,
+                            DefaultVertexFormat.POSITION_COLOR
+                    )
+                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    .withDepthStencilState(
+                            new DepthStencilState(
+                                    CompareOp.ALWAYS_PASS,
+                                    false
+                            )
+                    )
+                    .build();
+    //? } else {
+    /*public static final RenderPipeline ARROW_PIPELINE =
             RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET, RenderPipelines.GLOBALS_SNIPPET)
                     .withLocation("pipeline/cb_lines")
                     .withVertexShader("core/position_color")
@@ -404,6 +442,7 @@ public class RenderUtil {
                             )
                     )
                     .build();
+    *///? }
 
     static {
         RenderPipelines.register(ARROW_PIPELINE);
@@ -412,7 +451,6 @@ public class RenderUtil {
     private static final RenderType ARROW = RenderType.create(
             "cb_arrow",
             RenderSetup.builder(ARROW_PIPELINE)
-                    .bufferSize(256)
                     .createRenderSetup()
     );
 

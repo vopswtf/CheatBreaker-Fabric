@@ -6,6 +6,7 @@ import cc.vops.cheatbreaker.client.ui.element.type.ColorPickerColorElement;
 import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.dash.DashUtil;
 import cc.vops.cheatbreaker.mixin.KeyMappingAccessor;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
@@ -13,7 +14,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +48,13 @@ public class GlobalSettings {
     public Setting enableFpsBoost;
     public Setting slowChunkLoading;
     public Setting fullBright;
-    public Setting enchantmentGlint;
     private Setting teamViewLabel;
     public Setting enableTeamView;
     public Setting showDistance;
     public Setting showOffScreenMarker;
     private Setting generalSettingsLabel;
     public Setting guiBlur;
+    public Setting overrideWorldTime;
     public Setting worldTime;
     public Setting lookView;
     public Setting snapModules;
@@ -75,6 +75,7 @@ public class GlobalSettings {
     public List<ColorPickerColorElement> IlIIlIIlIllIIIIllIIllIlIl = new ArrayList<>();
 
     public boolean isFreeLooking = false;
+    public CameraType freeLookPerspective;
     public int freeLookPitch = -1;
     public int freeLookYaw = -1;
     private CameraType lastPerspective;
@@ -145,7 +146,6 @@ public class GlobalSettings {
         this.enableFpsBoost = new Setting(this.settingsList, "Enable FPS Boost").setValue(true);
         this.slowChunkLoading = new Setting(this.settingsList, "Slow chunk loading (%)").setMinMax(5, 100).setValue(30);
         this.fullBright = new Setting(this.settingsList, "Fullbright").setValue(true);
-        this.enchantmentGlint = new Setting(this.settingsList, "Enchantment Glint").setValue(true);
         this.teamViewLabel = new Setting(this.settingsList, "label").setValue("Team View Settings");
         this.enableTeamView = new Setting(this.settingsList, "Enable Team View").setValue(true);
         this.showOffScreenMarker = new Setting(this.settingsList, "Show off-screen marker").setValue(true);
@@ -153,6 +153,7 @@ public class GlobalSettings {
         this.showTeamHeads = new Setting(this.settingsList, "Show teammate heads").setValue(true);
         this.generalSettingsLabel = new Setting(this.settingsList, "label").setValue("General Settings");
         this.guiBlur = new Setting(this.settingsList, "GUI Blur").setValue(false);
+        this.overrideWorldTime = new Setting(this.settingsList, "Override World Time").setValue(false);
         this.worldTime = new Setting(this.settingsList, "World Time").setValue(-14490).setMinMax(-22880, -6100);
         this.lookView = new Setting(this.settingsList, "Look View").setValue("Third").acceptedValues("Third", "Reverse", "First");
         this.snapModules = new Setting(this.settingsList, "Snap mods to other mods (GUI)").setValue(true);
@@ -183,7 +184,7 @@ public class GlobalSettings {
 
     private void onTickEnd(Minecraft client) {
         if (client.player != null && FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            if (Keyboard.isKeyDown(GLFW.GLFW_KEY_K) && Keyboard.isCtrlKeyDown()) {
+            if (Keyboard.isKeyDown(InputConstants.KEY_K) && Keyboard.isCtrlKeyDown()) {
                 client.grabPanoramixScreenshot(client.gameDirectory);
                 client.player.sendOverlayMessage(Component.literal("Took screenshot with Panoramix!"));
             }
@@ -191,7 +192,7 @@ public class GlobalSettings {
 
         if (!isFreeLooking && dragLook.isDown()) {
             startFreeLooking(client);
-        } else if (isFreeLooking && (!dragLook.isDown() || (client.options.getCameraType() != CameraType.THIRD_PERSON_BACK && client.options.getCameraType() != CameraType.THIRD_PERSON_FRONT))) {
+        } else if (isFreeLooking && (!dragLook.isDown() || (client.options.getCameraType() != freeLookPerspective))) {
             stopFreeLooking(client);
         }
     }
@@ -200,16 +201,20 @@ public class GlobalSettings {
         if (client.player == null) return;
 
         lastPerspective = client.options.getCameraType();
-        if (lastPerspective == CameraType.FIRST_PERSON) {
-            client.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+
+        CameraType targetType = lookView.getAsString().equals("Third") ? CameraType.THIRD_PERSON_BACK : lookView.getAsString().equals("Reverse") ? CameraType.THIRD_PERSON_FRONT : CameraType.FIRST_PERSON;
+        if (lastPerspective != targetType) {
+            client.options.setCameraType(targetType);
         }
+        freeLookPerspective = targetType;
         freeLookPitch = client.player.xRotO == client.player.getXRot() ? (int) client.player.getXRot() : (int) client.player.xRotO;
-        freeLookYaw = client.player.yRotO == client.player.getYRot() ? (int) client.player.getYRot() : (int) client.player.yRotO;
+        freeLookYaw = (client.player.yRotO == client.player.getYRot() ? (int) client.player.getYRot() : (int) client.player.yRotO);
         isFreeLooking = true;
     }
 
     private void stopFreeLooking(Minecraft client) {
         isFreeLooking = false;
+        freeLookPerspective = null;
         freeLookPitch = -1;
         freeLookYaw = -1;
         client.options.setCameraType(lastPerspective);

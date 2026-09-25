@@ -8,6 +8,12 @@ pluginManagement {
     }
 }
 
-file("dynamic-module").eachDir { dir ->
-    include("dynamic-module:${dir.name}")
+plugins {
+    id("dev.kikugie.stonecutter") version "0.9.8"
+}
+
+stonecutter {
+    create(getRootProject()) {
+        versions '26.1.2', '26.2', '26.3'
+    }
 }

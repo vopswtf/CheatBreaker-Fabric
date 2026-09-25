@@ -1,6 +1,7 @@
 package cc.vops.cheatbreaker.mixin.freelook;
 
 import cc.vops.cheatbreaker.CheatBreaker;
+import cc.vops.cheatbreaker.client.util.bridge.GameRendererBridge;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
@@ -25,7 +26,7 @@ public class EntityMixin {
         if (CheatBreaker.getInstance().getGlobalSettings().isFreeLooking) {
             ci.cancel();
 
-            if (Minecraft.getInstance().gameRenderer.getMainCamera() instanceof Camera camera) {
+            if (GameRendererBridge.getMainCamera() instanceof Camera camera) {
                 float f = (float)p_19886_ * 0.15F;
                 float f1 = (float)p_19885_ * 0.15F;
 

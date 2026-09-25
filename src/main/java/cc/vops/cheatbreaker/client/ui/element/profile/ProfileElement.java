@@ -7,6 +7,7 @@ import cc.vops.cheatbreaker.client.ui.element.AbstractModulesGuiElement;
 import cc.vops.cheatbreaker.client.ui.element.AbstractScrollableElement;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
 import cc.vops.cheatbreaker.client.ui.module.CBProfileCreateGui;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import net.minecraft.client.Minecraft;
@@ -161,7 +162,7 @@ public class ProfileElement extends AbstractModulesGuiElement {
             }
         } else if (this.profile.isEditable() && bl2) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            Minecraft.getInstance().setScreen(new CBProfileCreateGui(this.profile, CBModulesGui.instance, (ProfilesListElement)this.parent, this.IllIIIIIIIlIlIllllIIllIII, this.scale));
+            GuiBridge.setScreen(new CBProfileCreateGui(this.profile, CBModulesGui.instance, (ProfilesListElement)this.parent, this.IllIIIIIIIlIlIllllIIllIII, this.scale));
         } else if (CheatBreaker.getInstance().getActiveProfile() != this.profile) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
             CheatBreaker.getInstance().getConfigManager().writeProfile(CheatBreaker.getInstance().getActiveProfile().getName());

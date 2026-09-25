@@ -1,5 +1,6 @@
-package cc.vops.overlay;
+package cc.vops.cheatbreaker.client.module.type;
 
+import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class OverlayModule extends AbstractModule {
     public OverlayModule() {
         super("Overlay");
         this.setDefaultState(false);
-        this.setPreviewIcon(Identifier.fromNamespaceAndPath("overlay", "icon.png"), 32, 32);
+        this.setPreviewIcon(CheatBreaker.asset("icons/mods/overlay.png"), 32, 32);
         this.getSettingsList().clear();
 
         new Setting(this, "label").setValue("First Person Options");

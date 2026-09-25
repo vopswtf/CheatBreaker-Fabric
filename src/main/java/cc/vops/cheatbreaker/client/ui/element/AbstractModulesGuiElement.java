@@ -1,8 +1,9 @@
 package cc.vops.cheatbreaker.client.ui.element;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
 import lombok.Getter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 @Getter
@@ -29,7 +30,7 @@ public abstract class AbstractModulesGuiElement {
     public abstract void onClick(int mouseX, int mouseY, int button);
 
     protected boolean isMouseInsideIgnoreOffset(double mouseX, double mouseY, boolean click) {
-        if (!(Minecraft.getInstance().screen instanceof CBModulesGui)) return false;
+        if (!(GuiBridge.getScreen() instanceof CBModulesGui)) return false;
         return mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y && mouseY <= this.y + this.height;
     }
 
@@ -38,7 +39,7 @@ public abstract class AbstractModulesGuiElement {
     }
 
     public boolean isMouseInside(double mouseX, double mouseY, boolean click) {
-        if (!(Minecraft.getInstance().screen instanceof CBModulesGui)) return false;
+        if (!(GuiBridge.getScreen() instanceof CBModulesGui)) return false;
 //        return mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y && mouseY <= this.y + this.height;
         // use yOffset for mouse y position to prevent issues with scrolling
         return mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y + this.yOffset && mouseY <= this.y + this.height + this.yOffset;

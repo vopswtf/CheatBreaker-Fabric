@@ -23,21 +23,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
 
-    @Shadow public abstract void setScreen(@Nullable Screen screen);
-
     @Shadow @Nullable public ClientLevel level;
 
-    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
-    private void onSetScreen(Screen screen, CallbackInfo ci) {
-        if (screen instanceof TitleScreen || (screen == null && this.level == null)) {
-            ci.cancel();
-            this.setScreen(new MainMenu());
-        }
+//    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+//    private void onSetScreen(Screen screen, CallbackInfo ci) {
+//        if (screen instanceof TitleScreen || (screen == null && this.level == null)) {
+//            ci.cancel();
+//            this.setScreen(new MainMenu());
+//        }
+//
+//        if (screen instanceof PauseScreen) {
+//            PauseUtil.fade.reset();
+//        }
+//    }
 
-        if (screen instanceof PauseScreen) {
-            PauseUtil.fade.reset();
-        }
-    }
     @Inject(method = "createTitle", at = @At("RETURN"), cancellable = true)
     private void modifyWindowTitle(CallbackInfoReturnable<String> cir) {
         String originalTitle = cir.getReturnValue();
@@ -79,7 +78,8 @@ public abstract class MinecraftMixin {
         });
     }
 
-    @Inject(method = "destroy", at = @At("HEAD"))
+//    @Inject(method = "destroy", at = @At("HEAD"))
+    @Inject(method = "close", at = @At("HEAD"))
     private void onDestroy(CallbackInfo ci) {
         CheatBreaker.getInstance().onShutdown();
     }

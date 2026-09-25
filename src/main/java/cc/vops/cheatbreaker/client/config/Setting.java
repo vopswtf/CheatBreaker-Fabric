@@ -39,9 +39,14 @@ public class Setting {
 
     // binds
     @Getter @Setter private String displayName = "Unknown";
+
+    // negative keycode for mouse
     @Getter private int keyCode;
-    @Getter private boolean hasKeycode = false;
-    @Getter @Setter private boolean allowMouseKeybinding = false;
+
+    @Getter @Setter private boolean hasKeycode = false;
+    @Getter private boolean allowMouseKeybinding = false;
+
+    public static final int UNSET_KEYCODE = Integer.MIN_VALUE;
 
     // slider delta for arrow keys
     @Getter private float delta = 1;
@@ -86,6 +91,21 @@ public class Setting {
         this.keyCode = keycode;
         this.hasKeycode = true;
         return this;
+    }
+
+    public Setting setUnboundKeyCode() {
+        this.keyCode = UNSET_KEYCODE;
+        this.hasKeycode = true;
+        return this;
+    }
+
+    public Setting setAllowMouseKeybinding(boolean allowMouseKeybinding) {
+        this.allowMouseKeybinding = allowMouseKeybinding;
+        return this;
+    }
+
+    public boolean isKeyCodeSet() {
+        return this.hasKeycode && this.keyCode != UNSET_KEYCODE && this.keyCode != 0;
     }
 
     public Setting setParent(Setting parent) {

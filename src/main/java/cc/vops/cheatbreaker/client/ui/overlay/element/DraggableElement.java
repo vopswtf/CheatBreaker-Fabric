@@ -12,7 +12,7 @@ public abstract class DraggableElement extends AbstractElement {
 
     protected void drag(float mouseX, float mouseY) {
         if (this.dragging.get()) {
-            if (!Mouse.isButtonDown(0)) {
+            if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
                 this.dragging.set(false);
                 return;
             }

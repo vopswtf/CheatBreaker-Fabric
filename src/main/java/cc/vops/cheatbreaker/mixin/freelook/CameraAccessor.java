@@ -23,13 +23,19 @@ public interface CameraAccessor {
     @Accessor("rotation")
     Quaternionf getRotation();
 
-    @Accessor("FORWARDS")
+    @Invoker("setRotation")
+    void setRot(float yRot, float xRot);
+
+//    @Accessor("FORWARDS")
+    @Accessor("forwards")
     Vector3f FORWARDS();
 
-    @Accessor("UP")
+//    @Accessor("UP")
+    @Accessor("up")
     Vector3f UP();
 
-    @Accessor("LEFT")
+//    @Accessor("LEFT")
+    @Accessor("left")
     Vector3f LEFT();
 
     @Accessor

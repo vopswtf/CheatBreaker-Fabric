@@ -7,10 +7,10 @@ import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 
 public class SliderElement extends AbstractModuleTypeElement {
     private Setting setting;
@@ -31,7 +31,7 @@ public class SliderElement extends AbstractModuleTypeElement {
         int offset = 170;
         int width = 170;
         boolean bl2 = (float) mouseX > (float)(this.x + offset) * this.scale && (float) mouseX < (float)(this.x + offset + width - 2) * this.scale && (float) mouseY > (float)(this.y + 4 + this.yOffset) * this.scale && (float) mouseY < (float)(this.y + 10 + this.yOffset) * this.scale;
-        if (button == 0 && bl2) {
+        if (button == Mouse.MOUSE_BUTTON_LEFT && bl2) {
             this.interacting = true;
         }
     }
@@ -43,7 +43,7 @@ public class SliderElement extends AbstractModuleTypeElement {
         int n3 = 150;
 //        CheatBreaker.getInstance().ubuntuMedium16px.drawString(this.setting.getLabel().toUpperCase(), this.x + 10, (float)(this.y + 2), -1895825408);
         RenderUtil.drawString(gui, Fonts.ubuntuMedium16, this.setting.getLabel().toUpperCase(), this.x + 10, this.y + 4, -1895825408);
-        if (this.interacting && !Mouse.isButtonDown(0)) {
+        if (this.interacting && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
             this.interacting = false;
         }
         String string = this.setting.getValue() + "";
@@ -51,16 +51,20 @@ public class SliderElement extends AbstractModuleTypeElement {
         RenderUtil.drawCenteredString(gui, Fonts.ubuntuMedium16, string, this.x + 82 + n3 / 2, (this.y + 4), -1895825408);
         boolean bl = (float) mouseX > (float)(this.x + 172) * this.scale && (float) mouseX < (float)(this.x + 172 + n3 - 2) * this.scale && (float) mouseY > (float)(this.y + 4 + this.yOffset) * this.scale && (float) mouseY < (float)(this.y + 10 + this.yOffset) * this.scale;
 
+        if (setting.getMinimumValue() == null || setting.getMaximumValue() == null) {
+            return;
+        }
+
         float minVal = Float.parseFloat("" + this.setting.getMinimumValue());
         float maxVal = Float.parseFloat("" + this.setting.getMaximumValue());
 
         KeyEvent keyEvent = Keyboard.peekKeyEvent();
-        if (bl && !Mouse.isButtonDown(0) && keyEvent != null && System.currentTimeMillis() - this.lastKeyboardUpdate > 150) {
-            if (keyEvent.key() != GLFW.GLFW_KEY_LEFT && keyEvent.key() != GLFW.GLFW_KEY_RIGHT) return;
+        if (bl && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) && keyEvent != null && System.currentTimeMillis() - this.lastKeyboardUpdate > 150) {
+            if (keyEvent.key() != InputConstants.KEY_LEFT && keyEvent.key() != InputConstants.KEY_RIGHT) return;
 
             this.value = Float.parseFloat("" + this.setting.getValue());
 
-            if (keyEvent.key() == GLFW.GLFW_KEY_LEFT) {
+            if (keyEvent.key() == InputConstants.KEY_LEFT) {
                 this.value = this.value - this.setting.getDelta();
             } else {
                 this.value = this.value + this.setting.getDelta();

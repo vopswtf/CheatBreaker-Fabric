@@ -7,6 +7,7 @@ import cc.vops.cheatbreaker.client.event.type.GameTickEvent;
 import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.module.GuiAnchor;
+import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -63,7 +64,7 @@ public class CPSModule extends AbstractModule {
     }
 
     private void onClick(ClickEvent cBClickEvent) {
-        if (cBClickEvent.getMouseButton() == 0) {
+        if (cBClickEvent.getMouseButton() == Mouse.MOUSE_BUTTON_LEFT) {
             this.clicks.add(System.currentTimeMillis());
         }
     }

@@ -58,6 +58,7 @@ public class Minimap {
     }
 
     public void renderMap(GuiGraphicsExtractor gfx) {
+        if (Minecraft.getInstance().player == null) return;
         x = 1f;
         y = 1f;
 
@@ -194,12 +195,15 @@ public class Minimap {
         graphics.pose().popMatrix();
     }
 
+    private long lastUpdateTime = 0;
     public void updateMapView() {
         if (tex == null) return;
         if (!module.isEnabled()) {
             updateDuration = -1;
             return;
         }
+        if (System.currentTimeMillis() - lastUpdateTime < 500) return;
+        this.lastUpdateTime = System.currentTimeMillis();
         long start = Util.getNanos();
         int centerX = minecraft.player.getBlockX();
         int centerZ = minecraft.player.getBlockZ();
@@ -225,7 +229,7 @@ public class Minimap {
             while (solidBlocksAbovePlayer <= 3 && surface > minecraft.player.getBlockY() && surface > level.getMinY()) {
                 BlockState state = centerChunk.getBlockState(mutableBlockPos);
                 mutableBlockPos.setY(surface--);
-                if (!(state.propagatesSkylightDown() || !state.canOcclude() || !state.isViewBlocking(level, mutableBlockPos))) {
+                if (!(state.propagatesSkylightDown() || !state.canOcclude() || !state.isSuffocating(level, mutableBlockPos))) {
                     solidBlocksAbovePlayer++;
                 }
             }

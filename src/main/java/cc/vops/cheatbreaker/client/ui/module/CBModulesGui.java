@@ -14,6 +14,7 @@ import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -21,7 +22,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -63,6 +63,8 @@ public class CBModulesGui extends AbstractGui {
     private int mouseX;
     private int mouseY;
     private int arrowKeyMoves;
+    private boolean snappedToScreenCenterX = false;
+    private boolean snappedToScreenCenterY = false;
 
     @Override
     protected void initMenu() {
@@ -117,11 +119,11 @@ public class CBModulesGui extends AbstractGui {
         int n = event.key();
         char c = (char) n;
 
-        if (n == GLFW.GLFW_KEY_ESCAPE || n == GlobalSettings.getKeyCode(CheatBreaker.getInstance().getGlobalSettings().openMenu)) {
+        if (n == InputConstants.KEY_ESCAPE || n == GlobalSettings.getKeyCode(CheatBreaker.getInstance().getGlobalSettings().openMenu)) {
             CheatBreaker.getInstance().getConfigManager().write();
         }
 
-        if (n == GLFW.GLFW_KEY_Z && Keyboard.isCtrlKeyDown()) {
+        if (n == InputConstants.KEY_Z && Keyboard.isCtrlKeyDown()) {
             if (!this.undoList.isEmpty()) {
                 int n2 = this.undoList.size() - 1;
                 ModuleActionData moduleActionData = this.undoList.get(this.undoList.size() - 1);
@@ -141,7 +143,7 @@ public class CBModulesGui extends AbstractGui {
                 this.redo.add(moduleActionData);
                 this.undoList.remove(n2);
             }
-        } else if (n == GLFW.GLFW_KEY_H && Keyboard.isCtrlKeyDown()) {
+        } else if (n == InputConstants.KEY_H && Keyboard.isCtrlKeyDown()) {
             if (!this.redo.isEmpty()) {
                 int n3 = this.redo.size() - 1;
                 ModuleActionData moduleActionData = this.redo.get(this.redo.size() - 1);
@@ -200,7 +202,9 @@ public class CBModulesGui extends AbstractGui {
 
         // Moving module stuff here
         if (draggingModule != null) {
-            if (!Mouse.isButtonDown(1)) {
+            this.snappedToScreenCenterX = false;
+            this.snappedToScreenCenterY = false;
+            if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT)) {
                 RenderUtil.drawRoundedRect(gfx, 2, 0.0, 2.916666637692187 * 0.8571428656578064, this.scaledHeight, 0.0, -15599126);
                 RenderUtil.drawRoundedRect(gfx, (float)this.scaledWidth - 5.0f * 0.5f, 0.0, this.scaledWidth - 2, this.scaledHeight, 0.0, -15599126);
                 RenderUtil.drawRoundedRect(gfx, 0.0, 2, this.scaledWidth, 1.1547619104385376 * 2.164948442965692, 0.0, -15599126);
@@ -233,7 +237,7 @@ public class CBModulesGui extends AbstractGui {
             }
             for (CBModulePosition position : this.positions) {
                 this.dragModule(position, mouseX, mouseY);
-                if (!(Boolean) CheatBreaker.getInstance().getGlobalSettings().snapModules.getValue() || !this.IlIlIIIlllllIIIlIlIlIllII || Mouse.isButtonDown(1) || position.module != draggingModule) continue;
+                if (!(Boolean) CheatBreaker.getInstance().getGlobalSettings().snapModules.getValue() || !this.IlIlIIIlllllIIIlIlIlIllII || Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT) || position.module != draggingModule) continue;
                 for (AbstractModule cBModule3 : this.modules) {
                     if (this.getModulePosition(cBModule3) != null || cBModule3.getGuiAnchor() == null || !cBModule3.isEnabled()) continue;
                     float f5 = 18;
@@ -291,6 +295,29 @@ public class CBModulesGui extends AbstractGui {
                     }
                     if (!(f2 >= (float)(-n3)) || !(f2 <= (float)n3) || !bl2) continue;
                     this.snapVertically(f2);
+                }
+            }
+
+            if ((Boolean) CheatBreaker.getInstance().getGlobalSettings().snapModules.getValue() && this.IlIlIIIlllllIIIlIlIlIllII && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT) && draggingModule != null) {
+                float dragScale = (Float) draggingModule.masterScale();
+                float[] dragPoints = draggingModule.getScaledPoints(true);
+
+                float dragCenterXScreen = (dragPoints[0] + draggingModule.width / 2.0f) * dragScale;
+                float dragCenterYScreen = (dragPoints[1] + draggingModule.height / 2.0f) * dragScale;
+                float screenCenterX = (float) this.scaledWidth / 2.0f;
+                float screenCenterY = (float) this.scaledHeight / 2.0f;
+                float threshold = 4.0f;
+
+                float diffXScreen = dragCenterXScreen - screenCenterX;
+                if (diffXScreen >= -threshold && diffXScreen <= threshold) {
+                    this.snappedToScreenCenterX = true;
+                    this.snapHorizontally(-diffXScreen / dragScale);
+                }
+
+                float diffYScreen = dragCenterYScreen - screenCenterY;
+                if (diffYScreen >= -threshold && diffYScreen <= threshold) {
+                    this.snappedToScreenCenterY = true;
+                    this.snapVertically(-diffYScreen / dragScale);
                 }
             }
         } else if (this.dataHolder != null) {
@@ -381,9 +408,9 @@ public class CBModulesGui extends AbstractGui {
             );
         }
 
-        drawModules(gfx);
-
         gfx.pose().popMatrix();
+
+        drawModules(gfx);
 
         for (ModulesGuiButtonElement buttonElement : this.buttons) {
             buttonElement.handleDrawElement(gfx, (int) mouseX, (int) mouseY, delta);
@@ -409,7 +436,7 @@ public class CBModulesGui extends AbstractGui {
         }
 
         if (this.mouseX != -1) {
-            if (Mouse.isButtonDown(0)) {
+            if (Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
                 if (this.mouseX != mouseX && this.mouseY != mouseY) {
                     this.drawMouseSelection(gfx, mouseX, mouseY);
                 }
@@ -500,10 +527,10 @@ public class CBModulesGui extends AbstractGui {
         if (System.currentTimeMillis() - this.lastKeyboardTick < 25) return;
         lastKeyboardTick = System.currentTimeMillis();
         if (!this.positions.isEmpty()) {
-            boolean leftKey = Keyboard.isKeyDown(GLFW.GLFW_KEY_LEFT) ;
-            boolean rightDown = Keyboard.isKeyDown(GLFW.GLFW_KEY_RIGHT) ;
-            boolean upDown = Keyboard.isKeyDown(GLFW.GLFW_KEY_UP) ;
-            boolean downDown = Keyboard.isKeyDown(GLFW.GLFW_KEY_DOWN) ;
+            boolean leftKey = Keyboard.isKeyDown(InputConstants.KEY_LEFT);
+            boolean rightDown = Keyboard.isKeyDown(InputConstants.KEY_RIGHT);
+            boolean upDown = Keyboard.isKeyDown(InputConstants.KEY_UP);
+            boolean downDown = Keyboard.isKeyDown(InputConstants.KEY_DOWN);
             if (leftKey || rightDown || upDown || downDown) {
                 this.arrowKeyMoves++;
                 if (this.arrowKeyMoves % 3 == 0) {
@@ -737,11 +764,11 @@ public class CBModulesGui extends AbstractGui {
                 }
 
                 if (this.isHoveringModule(mouseX, mouseY)) continue;
-                if (button == 0) {
+                if (button == Mouse.MOUSE_BUTTON_LEFT) {
                     this.undoList.add(new ModuleActionData(this, this.positions));
                     this.dataHolder = new ModuleDataHolder(this, module, screenLocation, (int) mouseX, (int) mouseY);
                     this.updateModuleAnchorAndTranslation(module, anchor, mouseX, mouseY);
-                } else if (button == 1) {
+                } else if (button == Mouse.MOUSE_BUTTON_RIGHT) {
                     GuiAnchor cBGuiAnchor2 = module.getGuiAnchor();
                     this.updateModuleAnchorAndTranslation(module, anchor, mouseX, mouseY);
                     module.scale.setValue(1.0f);
@@ -788,7 +815,7 @@ public class CBModulesGui extends AbstractGui {
                 continue;
             boolean bl3 = !cBModule.getSettingsList().isEmpty() && (float) n >= arrf[0] * (Float) cBModule.masterScale() && (float) n <= (arrf[0] + (float) 10) * ((Float) cBModule.masterScale()).floatValue() && (float) n2 >= (arrf[1] + cBModule.height - (float) 10) * ((Float) cBModule.masterScale()).floatValue() && (float) n2 <= (arrf[1] + cBModule.height + 2.0f) * ((Float) cBModule.masterScale()).floatValue();
             boolean bl4 = bl = (float) n > (arrf[0] + cBModule.width - (float) 10) * (Float) cBModule.masterScale() && (float) n < (arrf[0] + cBModule.width + 2.0f) * ((Float) cBModule.masterScale()).floatValue() && (float) n2 > (arrf[1] + cBModule.height - (float) 10) * ((Float) cBModule.masterScale()).floatValue() && (float) n2 < (arrf[1] + cBModule.height + 2.0f) * ((Float) cBModule.masterScale()).floatValue();
-            if (n3 == 0 && !bl3 && !bl) {
+            if (n3 == Mouse.MOUSE_BUTTON_LEFT && !bl3 && !bl) {
                 boolean bl5 = true;
                 if (this.getModulePosition(cBModule) != null) {
                     this.removePositionForModule(cBModule);
@@ -810,7 +837,7 @@ public class CBModulesGui extends AbstractGui {
                 }
                 this.setSelectedModulesPosition(n, n2);
             }
-            if (!(n3 != 0 || this.focusedElement != null && this.focusedElement.isMouseInside(n, n2, true))) {
+            if (!(this.focusedElement != null && this.focusedElement.isMouseInside(n, n2, true))) {
                 if (bl3) {
                     CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                     ((ModuleListElement)this.settingsElement).resetColor = false;
@@ -820,7 +847,7 @@ public class CBModulesGui extends AbstractGui {
                     CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                     cBModule.setState(false);
                 }
-            } else if (n3 == 1) {
+            } else if (n3 == Mouse.MOUSE_BUTTON_RIGHT) {
                 CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                 float[] arrf2 = CBAnchorHelper.getPositions(cBModule.getGuiAnchor());
                 cBModule.setTranslations(arrf2[0], arrf2[1]);
@@ -875,7 +902,15 @@ public class CBModulesGui extends AbstractGui {
     }
 
     private void drawModules(GuiGraphicsExtractor gfx) {
-        if (!Mouse.isButtonDown(1) && draggingModule != null) {
+        if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT) && draggingModule != null) {
+            if (this.snappedToScreenCenterX) {
+                float centerX = (float) this.scaledWidth / 2.0f;
+                RenderUtil.drawRoundedRect(gfx, centerX - 0.5f, 0.0, centerX + 0.5f, this.scaledHeight, 0.0, -3596854);
+            }
+            if (this.snappedToScreenCenterY) {
+                float centerY = (float) this.scaledHeight / 2.0f;
+                RenderUtil.drawRoundedRect(gfx, 0.0, centerY - 0.5f, this.scaledWidth, centerY + 0.5f, 0.0, -3596854);
+            }
             for (CBModulePosition CBModulePosition : this.positions) {
                 if (CBModulePosition.module != draggingModule || !(Boolean) CheatBreaker.getInstance().getGlobalSettings().snapModules.getValue()) continue;
                 for (AbstractModule cBModule : this.modules) {
@@ -939,6 +974,7 @@ public class CBModulesGui extends AbstractGui {
                     }
                     if (!bl) continue;
                     gfx.pose().pushMatrix();
+                    cBModule.scaleAndTranslate(gfx);
                     RenderUtil.drawRectWithOutline(gfx, 0f, 0.0f, cBModule.width, cBModule.height, 0.01923077f * 26.0f, 0, 449387978);
                     gfx.pose().popMatrix();
                 }
@@ -956,11 +992,11 @@ public class CBModulesGui extends AbstractGui {
 
     @Override
     protected void onMouseReleased(double mouseX, double mouseY, int button) {
-        if (this.dataHolder != null && button == 0) {
+        if (this.dataHolder != null && button == Mouse.MOUSE_BUTTON_LEFT) {
             this.updateModuleAnchorAndTranslations(this.dataHolder.module, this.dataHolder.anchor);
             this.dataHolder = null;
         }
-        if (draggingModule != null && button == 0) {
+        if (draggingModule != null && button == Mouse.MOUSE_BUTTON_LEFT) {
             if (this.IlIlIIIlllllIIIlIlIlIllII) {
                 for (CBModulePosition CBModulePosition : this.positions) {
                     GuiAnchor cBGuiAnchor = CBAnchorHelper.getAnchor((float) mouseX, (float) mouseY, this);
@@ -976,6 +1012,8 @@ public class CBModulesGui extends AbstractGui {
                 }
                 CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
             }
+            this.snappedToScreenCenterX = false;
+            this.snappedToScreenCenterY = false;
             draggingModule = null;
         }
     }
@@ -999,7 +1037,7 @@ public class CBModulesGui extends AbstractGui {
 
     private boolean handleMainButtonPress(int n, int n2, int n3) {
         for (ModulesGuiButtonElement button : this.buttons) {
-            if (n3 != 0 || !button.isMouseInside(n, n2, true) || allMenusClosed) continue;
+            if (!button.isMouseInside(n, n2, true) || allMenusClosed) continue;
             if (button.scrollableElement != null && this.focusedElement != button.scrollableElement && this.currentScrollableElement == null) {
                 this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 this.currentScrollableElement = button.scrollableElement;
@@ -1049,7 +1087,7 @@ public class CBModulesGui extends AbstractGui {
             this.IlIlIIIlllllIIIlIlIlIllII = true;
         }
         float[] arrf = CBModulePosition.module.getScaledPoints(false);
-        if (!Mouse.isButtonDown(1) && this.IlIlIIIlllllIIIlIlIlIllII && CBModulePosition.module == draggingModule) {
+        if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT) && this.IlIlIIIlllllIIIlIlIlIllII && CBModulePosition.module == draggingModule) {
             float f3 = f;
             float f4 = f2;
             f = this.clampModuleXTranslation(CBModulePosition.module, f, arrf, (int) (CBModulePosition.module.width * (Float) CBModulePosition.module.masterScale()));

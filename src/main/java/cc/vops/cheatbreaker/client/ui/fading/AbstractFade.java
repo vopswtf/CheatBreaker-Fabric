@@ -10,7 +10,6 @@ public abstract class AbstractFade {
     protected long duration;
     protected boolean expireAtEndTime = true;
     protected float IIIIllIIllIIIIllIllIIIlIl;
-    @Getter
     protected long timeElapsed;
     protected final float currentFadePercentage;
     private boolean shouldResetOnceCalled;

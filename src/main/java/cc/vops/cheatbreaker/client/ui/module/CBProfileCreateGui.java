@@ -6,8 +6,10 @@ import cc.vops.cheatbreaker.client.config.Profile;
 import cc.vops.cheatbreaker.client.ui.AbstractGui;
 import cc.vops.cheatbreaker.client.ui.element.profile.ProfileElement;
 import cc.vops.cheatbreaker.client.ui.element.profile.ProfilesListElement;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
@@ -16,7 +18,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -47,7 +48,7 @@ public class CBProfileCreateGui extends AbstractGui {
     @Override
     protected void initMenu() {
         if (!this.showGui) {
-            this.mc.setScreen(this.previousScreen);
+            GuiBridge.setScreen(this.previousScreen);
             this.previousScreen.currentScrollableElement = this.previousScreen.profilesElement;
         } else {
             this.showGui = false;
@@ -63,7 +64,7 @@ public class CBProfileCreateGui extends AbstractGui {
     public boolean keyPressed(KeyEvent event) {
         int key = event.key();
 
-        if (key == GLFW.GLFW_KEY_ENTER) {
+        if (key == InputConstants.KEY_RETURN) {
             if (this.textField.getValue().length() < 3) {
                 this.errorString = ChatFormatting.RED + "Name must be at least 3 characters long.";
                 return false;
@@ -85,7 +86,7 @@ public class CBProfileCreateGui extends AbstractGui {
                     Files.copy(baseProfile.toPath(), file2.toPath());
                     Files.delete(baseProfile.toPath());
                     this.profile.setName(this.textField.getValue());
-                    this.mc.setScreen(this.previousScreen);
+                    GuiBridge.setScreen(this.previousScreen);
                     this.previousScreen.currentScrollableElement = this.previousScreen.profilesElement;
                 } catch (Exception exception) {
                     this.errorString = ChatFormatting.RED + "Could not save profile.";
@@ -108,7 +109,7 @@ public class CBProfileCreateGui extends AbstractGui {
                 CheatBreaker.getInstance().setActiveProfile(profile3);
                 this.parent.profileElementList.add(new ProfileElement(this.parent, this.highlightColor, profile3, this.scale));
                 CheatBreaker.getInstance().getConfigManager().writeProfile(CheatBreaker.getInstance().getActiveProfile().getName());
-                this.mc.setScreen(this.previousScreen);
+                GuiBridge.setScreen(this.previousScreen);
                 this.previousScreen.currentScrollableElement = this.previousScreen.profilesElement;
                 return true;
             }

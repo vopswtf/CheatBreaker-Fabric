@@ -5,6 +5,7 @@ import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.element.AbstractModulesGuiElement;
 import cc.vops.cheatbreaker.client.ui.element.AbstractScrollableElement;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
+import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -69,7 +70,7 @@ public class ModuleSettingsElement extends AbstractModulesGuiElement {
         double d5 = (double)this.scrollbar.scrollAmount / 100.0 * d3;
         boolean bl4 = (float)mouseX > (float)(this.x + this.width - 9) * this.scale && (float)mouseX < (float)(this.x + this.width - 3) * this.scale && (double)mouseY > ((double)(this.y + 11) - d5) * (double)this.scale && (double)mouseY < ((double)(this.y + 8) + d4 - d5) * (double)this.scale;
         boolean bl3 = (float)mouseX > (float)(this.x + this.width - 9) * this.scale && (float)mouseX < (float)(this.x + this.width - 3) * this.scale && (float)mouseY > (float)(this.y + 11) * this.scale && (double)mouseY < ((double)(this.y + 6) + d - (double)3) * (double)this.scale;
-        if (button == 0 && bl3 || bl4) {
+        if (button == Mouse.MOUSE_BUTTON_LEFT && bl3 || bl4) {
             this.scrollbar.hovering = true;
         }
         this.scrollbar.handleModuleMouseClick(this.module);

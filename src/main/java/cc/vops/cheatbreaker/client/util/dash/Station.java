@@ -1,6 +1,7 @@
 package cc.vops.cheatbreaker.client.util.dash;
 
 import cc.vops.cheatbreaker.CheatBreaker;
+import lombok.Setter;
 import net.minecraft.resources.Identifier;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,6 +15,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.TimeZone;
 
+@Setter
 public class Station {
     private String streamURL;
     private String currentSongURL;

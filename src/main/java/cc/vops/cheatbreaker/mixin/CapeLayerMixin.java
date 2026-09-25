@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,7 +47,23 @@ public abstract class CapeLayerMixin {
                         pose.translate(0.0F, -0.053125F, 0.06875F);
                     }
 
+
+                    //? if >=26.3 {
                     p_430860_.submitModel(
+                            this.model,
+                            p_428454_,
+                            pose,
+                            RenderTypes.entitySolid(
+                                    cape != null ? cape.getLocation() : playerskin.cape().texturePath()
+                            ),
+                            p_427257_,
+                            OverlayTexture.NO_OVERLAY,
+                            -1,
+                            null,
+                            p_428454_.outlineColor
+                    );
+                    //? } else {
+                    /*p_430860_.submitModel(
                             this.model,
                             p_428454_,
                             pose,
@@ -58,6 +75,7 @@ public abstract class CapeLayerMixin {
                             p_428454_.outlineColor,
                             null
                     );
+                    *///? }
                     pose.popPose();
                 }
             }
@@ -67,13 +85,26 @@ public abstract class CapeLayerMixin {
         if (wings != null && !p_428454_.isInvisible && !hasLayer(p_428454_.chestEquipment, EquipmentClientInfo.LayerType.WINGS)) {
             pose.pushPose();
 
-            pose.mulPose(Axis.ZP.rotationDegrees(180.0F));
+            pose.mulPose(new Matrix4f().set(Axis.ZP.rotationDegrees(180.0F)));
             pose.translate(0.0F, 0.0F, 0.125F);
             pose.scale(wings.getScale(), wings.getScale(), wings.getScale());
 
             CosmeticModels.WINGS.setupAnim(p_428454_);
 
+            //? if >=26.3 {
             p_430860_.submitModel(
+                    CosmeticModels.WINGS,
+                    p_428454_,
+                    pose,
+                    RenderTypes.entityTranslucent(wings.getLocation()),
+                    p_427257_,
+                    OverlayTexture.NO_OVERLAY,
+                    -1,
+                    null,
+                    p_428454_.outlineColor
+            );
+            //? } else {
+            /*p_430860_.submitModel(
                     CosmeticModels.WINGS,
                     p_428454_,
                     pose,
@@ -83,6 +114,7 @@ public abstract class CapeLayerMixin {
                     p_428454_.outlineColor,
                     null
             );
+            *///? }
 
             pose.scale(1.0F, 1.0F, 1.0F);
             pose.popPose();

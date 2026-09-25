@@ -11,11 +11,13 @@ import cc.vops.cheatbreaker.client.module.ModuleManager;
 import cc.vops.cheatbreaker.client.nethandler.apollo.ApolloNetHandler;
 import cc.vops.cheatbreaker.client.ui.module.CBModulePlaceGui;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.cosmetic.Cosmetic;
 import cc.vops.cheatbreaker.client.util.Sounds;
 import cc.vops.cheatbreaker.client.util.cosmetic.CosmeticModels;
 import cc.vops.cheatbreaker.client.util.cosmetic.EmoteManager;
 import cc.vops.cheatbreaker.client.util.dash.CBDashManager;
+import cc.vops.cheatbreaker.client.util.dash.LocalStation;
 import cc.vops.cheatbreaker.client.util.friend.FriendsManager;
 import cc.vops.cheatbreaker.client.util.friend.Status;
 import cc.vops.cheatbreaker.client.websocket.AssetsWebSocket;
@@ -24,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
@@ -123,12 +126,31 @@ public class CheatBreaker implements ModInitializer {
         this.friendsManager = new FriendsManager();
     }
 
+    private boolean enabled = true;
+
     public void onShutdown() {
+        this.enabled = false;
+
         if (this.assetsWebSocket != null) {
-            this.assetsWebSocket.close();
+            try {
+                this.assetsWebSocket.closeBlocking();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         configManager.writeProfile(activeProfile.getName());
+
+        if (voiceChatManager.getThread() != null) voiceChatManager.getThread().interrupt();
+        if (voiceChatManager.getThreadUpdate() != null) voiceChatManager.getThreadUpdate().interrupt();
+        if (radioManager.getDashThread() != null) radioManager.getDashThread().interrupt();
+        if (radioManager.getDashQueueThread() != null) radioManager.getDashQueueThread().shutdown();
+
+        if (radioManager.getLocalStation() instanceof LocalStation ls) {
+            if (ls.getMedia() != null) {
+                ls.getMedia().close();
+            }
+        }
     }
 
     public static Identifier asset(String path) {
@@ -186,7 +208,7 @@ public class CheatBreaker implements ModInitializer {
             final Map<String, String> hashMap = new HashMap<>();
             hashMap.put("username", Minecraft.getInstance().getUser().getName());
             hashMap.put("playerId", Minecraft.getInstance().getUser().getProfileId().toString());
-            hashMap.put("version", FabricLoader.getInstance().getModContainer("cheatbreaker").orElseThrow().getMetadata().getVersion().getFriendlyString());
+            hashMap.put("version", FabricLoader.getInstance().getModContainer("cheatbreaker").orElseThrow().getMetadata().getVersion().getFriendlyString() + "/" + SharedConstants.getCurrentVersion().name());
             hashMap.put("status", (status == Status.HIDDEN ? lastOnline : status.ordinal()) + "");
             this.assetsWebSocket = new AssetsWebSocket(new URI("wss://cheatbreaker.vops.cc"), hashMap);
 
@@ -281,7 +303,7 @@ public class CheatBreaker implements ModInitializer {
     }
 
     public static boolean isInModuleScreen() {
-        return Minecraft.getInstance().screen != null && (Minecraft.getInstance().screen instanceof CBModulesGui || Minecraft.getInstance().screen instanceof CBModulePlaceGui);
+        return GuiBridge.getScreen() instanceof CBModulesGui || GuiBridge.getScreen() instanceof CBModulePlaceGui;
     }
 
     public String getPluginMessageChannel() {

@@ -1,5 +1,6 @@
 package cc.vops.cheatbreaker.client.util;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 
 public class Mouse {
@@ -11,13 +12,27 @@ public class Mouse {
     public static double mouseX = 0;
     public static double mouseY = 0;
 
+    //? if >= 26.3 {
+    public static final int MOUSE_BUTTON_LEFT = InputConstants.MOUSE_BUTTON_LEFT;
+    public static final int MOUSE_BUTTON_RIGHT = InputConstants.MOUSE_BUTTON_RIGHT;
+    public static final int MOUSE_BUTTON_MIDDLE = InputConstants.MOUSE_BUTTON_MIDDLE;
+    public static final int MOUSE_BUTTON_SIDE1 = InputConstants.MOUSE_BUTTON_4;
+    public static final int MOUSE_BUTTON_SIDE2 = InputConstants.MOUSE_BUTTON_5;
+    //? } else {
+    /*public static final int MOUSE_BUTTON_LEFT = 0;
+    public static final int MOUSE_BUTTON_RIGHT = 1;
+    public static final int MOUSE_BUTTON_MIDDLE = 2;
+    public static final int MOUSE_BUTTON_SIDE1 = 3;
+    public static final int MOUSE_BUTTON_SIDE2 = 4;
+    *///? }
+
     public static boolean isButtonDown(int button) {
         return switch (button) {
-            case 0 -> mouseLeftDown;
-            case 1 -> mouseRightDown;
-            case 2 -> mouseMiddleDown;
-            case 3 -> mouseSideButton1Down;
-            case 4 -> mouseSideButton2Down;
+            case MOUSE_BUTTON_LEFT -> mouseLeftDown;
+            case MOUSE_BUTTON_RIGHT -> mouseRightDown;
+            case MOUSE_BUTTON_MIDDLE -> mouseMiddleDown;
+            case MOUSE_BUTTON_SIDE1 -> mouseSideButton1Down;
+            case MOUSE_BUTTON_SIDE2 -> mouseSideButton2Down;
             default -> false;
         };
 

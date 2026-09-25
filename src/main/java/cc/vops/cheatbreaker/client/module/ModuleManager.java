@@ -33,8 +33,6 @@ public class ModuleManager {
     public VoiceChat voiceChat;
     public TeammatesModule teammatesModule;
 
-    private static final List<Class<? extends AbstractModule>> pendingRegistration = new ArrayList<>();
-
     public ModuleManager() {
         modules = new ArrayList<>();
         staffModules = new ArrayList<>();
@@ -51,33 +49,15 @@ public class ModuleManager {
         modules.add(bossBar = new BossBarModule());
         modules.add(cpsModule = new CPSModule());
         modules.add(fpsModule = new FPSModule());
+        modules.add(new AutoHotKeyModule());
+        modules.add(new OverlayModule());
+        modules.add(new PotionCounterModule());
+        modules.add(new SaturationModule());
         this.voiceChat = new VoiceChat();
         this.teammatesModule = new TeammatesModule();
-//
-//        staffModules.add(xray = new XRayModule());
-        for (Class<? extends AbstractModule> moduleClass : new ArrayList<>(pendingRegistration)) {
-            CheatBreaker.LOGGER.info("Registering Dynamic Module: {}", moduleClass.getName());
-
-            try {
-                modules.add(moduleClass.getConstructor().newInstance());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        pendingRegistration.clear();
     }
 
     public static void registerModule(Class<? extends AbstractModule> moduleClass) {
-        if (CheatBreaker.getInstance() == null || CheatBreaker.getInstance().getModuleManager() == null) {
-            pendingRegistration.add(moduleClass);
-            return;
-        }
-
-        try {
-            AbstractModule module = moduleClass.getConstructor().newInstance();
-            CheatBreaker.getInstance().getModuleManager().modules.add(module);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Deprecated
     }
 }

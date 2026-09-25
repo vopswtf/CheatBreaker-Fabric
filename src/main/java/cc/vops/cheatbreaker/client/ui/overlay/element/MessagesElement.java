@@ -4,18 +4,19 @@ import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.ui.mainmenu.AbstractElement;
 import cc.vops.cheatbreaker.client.ui.mainmenu.element.ScrollableElement;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.PlayerHeads;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.friend.Friend;
 import cc.vops.cheatbreaker.client.websocket.shared.WSPacketMessage;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,6 +25,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessagesElement extends DraggableElement {
@@ -113,7 +115,7 @@ public class MessagesElement extends DraggableElement {
                 RenderUtil.drawRoundedRect(gfx, this.x - (float)10 - f4, f3 + 2.0f, this.x - 2.0f, f3 + (float)14, (double)6, -1895825408);
 //                this.client.playRegular16px.drawString(friend.getName(), this.x - (float)6 - f4, f3 + (float)4, -1);
                 RenderUtil.drawString(gfx, Fonts.playRegular16, friend.getName(), this.x - 6.0f - f4, f3 + 4.0f, -1);
-                if (Mouse.isButtonDown(0) && this.friend != friend) {
+                if (Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) && this.friend != friend) {
                     CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                     this.friend = friend;
                 }
@@ -136,11 +138,11 @@ public class MessagesElement extends DraggableElement {
                 int n3 = 0;
                 for (int messageIndex = messages.size() - 1; messageIndex >= 0; --messageIndex) {
                     String message = messages.get(messageIndex);
-                    restring = Fonts.playRegular16.plainSubstrByWidth(message, (int) (this.width - 25.0f)).split("\n");
+                    restring = wrapText(message, (int) (this.width - 40.0f)).toArray(new String[0]);
                     n3 += restring.length * 10;
                     int n4 = 0;
                     for (String string2 : restring) {
-//                        CheatBreaker.getInstance().playRegular16px.drawString(string2, this.x + (float)31, this.y + this.height - (float)19 - (float)n3 + (float)(n4 * 10), -1);
+                        // actually draw the string
                         RenderUtil.drawString(gfx, Fonts.playRegular16, string2, this.x + 31.0f, this.y + this.height - 19.0f - (float)n3 + (float)(n4 * 10), -1);
                         ++n4;
                     }
@@ -169,6 +171,31 @@ public class MessagesElement extends DraggableElement {
         }
     }
 
+    private List<String> wrapText(String text, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        String remaining = text;
+
+        while (!remaining.isEmpty()) {
+            String fit = Fonts.playRegular16.plainSubstrByWidth(remaining, maxWidth);
+
+            if (fit.length() == remaining.length()) {
+                lines.add(remaining);
+                break;
+            }
+
+            int breakAt = fit.lastIndexOf(' ');
+
+            if (breakAt <= 0) {
+                breakAt = fit.length();
+            }
+
+            lines.add(remaining.substring(0, breakAt).trim());
+            remaining = remaining.substring(breakAt).trim();
+        }
+
+        return lines;
+    }
+
     @Override
     public void handleElementUpdate() {
         this.inputFieldElement.handleElementUpdate();
@@ -192,7 +219,7 @@ public class MessagesElement extends DraggableElement {
 
     @Override
     public void handleElementKeyTyped(int keyCode, int scanCode, int modifiers) {
-        if (this.inputFieldElement.isFocused() && !this.inputFieldElement.getText().equals("") && keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (this.inputFieldElement.isFocused() && !this.inputFieldElement.getText().equals("") && keyCode == InputConstants.KEY_RETURN) {
             this.sendMessage();
         }
         this.inputFieldElement.handleElementKeyTyped(keyCode, scanCode, modifiers);

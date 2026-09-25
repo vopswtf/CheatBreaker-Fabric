@@ -6,12 +6,14 @@ import cc.vops.cheatbreaker.client.ui.overlay.element.DraggableElement;
 import cc.vops.cheatbreaker.client.ui.overlay.element.FlatButtonElement;
 import cc.vops.cheatbreaker.client.ui.overlay.element.InputFieldElement;
 import cc.vops.cheatbreaker.client.util.ChatColor;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.websocket.shared.WSPacketConsole;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.sounds.SoundEvents;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -126,7 +128,7 @@ public class ConsoleElement extends DraggableElement {
 
     @Override
     public void handleElementKeyTyped(int keyCode, int scanCode, int modifiers) {
-        if (this.textInputElement.isFocused() && !this.textInputElement.getText().equals("") && keyCode == GLFW.GLFW_KEY_ENTER) {
+        if (this.textInputElement.isFocused() && !this.textInputElement.getText().equals("") && keyCode == InputConstants.KEY_RETURN) {
             this.sendCommandToServer();
         }
         this.textInputElement.handleElementKeyTyped(keyCode, scanCode, modifiers);

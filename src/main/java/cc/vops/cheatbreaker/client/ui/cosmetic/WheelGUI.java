@@ -4,6 +4,7 @@ import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.ui.AbstractGui;
 import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import com.google.common.base.Preconditions;
 import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.blaze3d.platform.Window;
@@ -78,7 +79,7 @@ public class WheelGUI extends AbstractGui {
                     }
                 }
             }
-            this.mc.setScreen(null);
+            GuiBridge.setScreen(null);
         }
     }
 

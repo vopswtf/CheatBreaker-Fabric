@@ -1,10 +1,11 @@
 package cc.vops.cheatbreaker.client.util;
 
+import cc.vops.cheatbreaker.client.util.bridge.KeyBridge;
+import com.mojang.blaze3d.platform.InputConstants;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
-import org.lwjgl.glfw.GLFW;
 
 public class Keyboard {
     @Setter
@@ -29,28 +30,20 @@ public class Keyboard {
     }
 
     public static boolean isKeyDown(int key) {
-        if (key < 6) {
-            System.err.println("Warning: Key code " + key + " is reserved for mouse buttons. Use Mouse.isButtonDown() instead.");
-            Thread.dumpStack();
-            return false;
-        }
-        long window = Minecraft.getInstance().getWindow().handle();
-        return GLFW.glfwGetKey(window, key) == GLFW.GLFW_PRESS;
+        return KeyBridge.isKeyDown(key);
     }
 
     public static boolean isCtrlKeyDown() {
-        return isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return KeyBridge.isKeyDown(InputConstants.KEY_LCONTROL) || KeyBridge.isKeyDown(InputConstants.KEY_RCONTROL);
     }
 
     public static boolean isShiftKeyDown() {
-        return isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
+        return KeyBridge.isKeyDown(InputConstants.KEY_LSHIFT) || KeyBridge.isKeyDown(InputConstants.KEY_RSHIFT);
     }
 
     public static String getKeyName(int key) {
         try {
-            String name = GLFW.glfwGetKeyName(key, 0);
-            if (name == null) throw new IllegalArgumentException();
-            return name.toUpperCase();
+            return KeyBridge.getKeyName(key);
         } catch (Exception e) {
             return "None";
         }

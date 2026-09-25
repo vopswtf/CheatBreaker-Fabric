@@ -6,10 +6,9 @@ import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.module.GuiAnchor;
+import cc.vops.cheatbreaker.client.util.bridge.KeyBridge;
 import cc.vops.cheatbreaker.mixin.KeyMappingAccessor;
-import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
@@ -103,10 +102,10 @@ public class KeystrokesModule extends AbstractModule {
         int boxSize = (Integer)this.boxSize.getValue();
         int gap = (Integer)this.gap.getValue();
         float fadeTime = (Integer) this.fadeTime.getValue();
-        String w = Objects.requireNonNull(GLFW.glfwGetKeyName(keyCodeForward, 0)).toUpperCase();
-        String a = Objects.requireNonNull(GLFW.glfwGetKeyName(keyCodeLeft, 0)).toUpperCase();
-        String s = Objects.requireNonNull(GLFW.glfwGetKeyName(keyCodeBack, 0)).toUpperCase();
-        String d = Objects.requireNonNull(GLFW.glfwGetKeyName(keyCodeRight, 0)).toUpperCase();
+        String w = KeyBridge.getKeyName(keyCodeForward).toUpperCase();
+        String a = KeyBridge.getKeyName(keyCodeLeft).toUpperCase();
+        String s = KeyBridge.getKeyName(keyCodeBack).toUpperCase();
+        String d = KeyBridge.getKeyName(keyCodeRight).toUpperCase();
         float upKeyWidth = (float)this.minecraft.font.width(w) * (Float) this.scale.getValue();
         float leftKeyWidth = (float)this.minecraft.font.width(a) * (Float) this.scale.getValue();
         float downKeyWidth = (float)this.minecraft.font.width(s) * (Float) this.scale.getValue();

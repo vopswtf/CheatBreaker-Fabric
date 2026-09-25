@@ -1,5 +1,7 @@
 package cc.vops.cheatbreaker.client.module.type.keystrokes;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
 import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.Mouse;
@@ -7,7 +9,6 @@ import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.mixin.KeyMappingAccessor;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 
@@ -35,7 +36,7 @@ public class Key {
 
     public void render(GuiGraphicsExtractor gui, final float n, final float n2, final int n3, final int n4, final int n5, final int n6) {
         final Minecraft minecraft = Minecraft.getInstance();
-        final boolean pressed = (minecraft.screen == null || minecraft.screen instanceof ContainerScreen || minecraft.screen instanceof CBModulesGui) && (keyCode < 6 ? Mouse.isButtonDown(this.keyCode) : Keyboard.isKeyDown(this.keyCode));
+        final boolean pressed = (GuiBridge.getScreen() == null || GuiBridge.getScreen() instanceof ContainerScreen || GuiBridge.getScreen() instanceof CBModulesGui) && (keyCode < 6 ? Mouse.isButtonDown(this.keyCode) : Keyboard.isKeyDown(this.keyCode));
         if (pressed && !this.pressed) {
             this.pressed = true;
             this.lastPressed = System.currentTimeMillis();

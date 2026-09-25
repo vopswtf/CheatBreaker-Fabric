@@ -1,9 +1,12 @@
 package cc.vops.cheatbreaker.client.ui.overlay.element;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.ui.fading.MinMaxFade;
 import cc.vops.cheatbreaker.client.ui.mainmenu.element.ScrollableElement;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
+import cc.vops.cheatbreaker.client.util.dash.LocalStation;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.ImageDownloader;
 import cc.vops.cheatbreaker.client.util.Mouse;
@@ -69,6 +72,7 @@ public class RadioElement extends DraggableElement {
             this.newHeight = height;
         }
         this.radioStationElements.sort(Comparator.comparing((RadioStationElement elem) -> !elem.getStation().isFavourite()).thenComparing(elem -> elem.getStation().getName()));
+        this.radioStationElements.sort(Comparator.comparing((RadioStationElement elem) -> elem.getStation() instanceof LocalStation).reversed());
         this.slider.setElementSize(x, y + this.newHeight, width, 8);
         this.filter.setElementSize(x, y + this.newHeight + (float)8, width - (float)30, 13);
         this.pin.setElementSize(x + width - (float)30, y + this.newHeight + (float)8, (float)30, 13);
@@ -95,13 +99,13 @@ public class RadioElement extends DraggableElement {
 
     @Override
     protected void handleElementDraw(GuiGraphicsExtractor gfx, float f, float f2, boolean bl) {
-        if (!(Minecraft.getInstance().screen instanceof SocialOverlayScreen) && !this.client.getGlobalSettings().pinRadio.getAsBoolean()) {
+        if (!(GuiBridge.getScreen() instanceof SocialOverlayScreen) && !this.client.getGlobalSettings().pinRadio.getAsBoolean()) {
             return;
         }
 
         this.drag(f, f2);
 
-        if (Mouse.isButtonDown(0) && slider.isMouseInside(f, f2)) {
+        if (Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) && slider.isMouseInside(f, f2)) {
             this.slider.handleElementMouseClicked(f, f2, 0, true);
         }
 
@@ -114,13 +118,15 @@ public class RadioElement extends DraggableElement {
                     url = station.getLogoURL();
                 }
 
-                station.currentResource = ImageDownloader.getImage("station-" + station.getArtist() + "-" + station.getName(), url);
+                if (!url.isEmpty()) {
+                    station.currentResource = ImageDownloader.getImage("station-" + station.getArtist() + "-" + station.getName(), url);
+                }
             }
 //            GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
             Identifier Identifier = station.currentResource == null ? this.dashIcon : station.currentResource;
             RenderUtil.drawIcon(gfx, Identifier, this.newHeight / 2.0f, this.x, this.y);
             float f3 = this.x + (float)50;
-            if (this.mc.screen == SocialOverlayScreen.getInstance()) {
+            if (GuiBridge.getScreen() == SocialOverlayScreen.getInstance()) {
                 boolean bl2 = this.isMouseInside(f, f2) && f > this.x + (float)34 && f < this.x + (float)44 && f2 < this.y + this.newHeight;
                 if (!DashUtil.isPlayerNotNull()) {
 //                    GL11.glColor4f(1.0f, 1.0f, 1.0f, bl2 ? 1.0f : 0.8f);
@@ -144,8 +150,17 @@ public class RadioElement extends DraggableElement {
                 under = "";
             }
 
-            RenderUtil.drawString(gfx, Fonts.playRegular16, sliceString(string, 125), f3, this.y + (float)4, -1);
-            RenderUtil.drawString(gfx, Fonts.playRegular12, sliceString(under, 125), f3, this.y + (float)17, -1342177281);
+            if (Fonts.playRegular16.canDisplay(string)) {
+                RenderUtil.drawString(gfx, Fonts.playRegular16, sliceString(string, 125), f3, this.y + (float)4, -1);
+            } else {
+                RenderUtil.drawString(gfx, Minecraft.getInstance().font, sliceString(string, 125), f3, this.y + (float)4, -1);
+            }
+
+            if (Fonts.playRegular12.canDisplay(under)) {
+                RenderUtil.drawString(gfx, Fonts.playRegular12, sliceString(under, 125), f3, this.y + (float)17, -1342177281);
+            } else {
+                RenderUtil.drawString(gfx, Minecraft.getInstance().font, sliceString(under, 125), f3, this.y + (float)17, -1342177281);
+            }
         }
         float f4 = this.fade.inOutFade(this.isMouseInside(f, f2) && bl);
         if (this.fade.isFadeOngoing()) {
@@ -171,7 +186,7 @@ public class RadioElement extends DraggableElement {
             gfx.pose().popMatrix();
             this.scrollableContainer.handleElementDraw(gfx, f, f2, bl);
 
-            if (this.mc.screen == SocialOverlayScreen.getInstance()) {
+            if (GuiBridge.getScreen() == SocialOverlayScreen.getInstance()) {
                 this.filter.handleElementDraw(gfx, f, f2, bl);
                 this.pin.handleElementDraw(gfx, f, f2, bl);
                 this.slider.drawElement(gfx, f, f2, bl);
@@ -251,7 +266,7 @@ public class RadioElement extends DraggableElement {
     @Override
     public boolean handleElementMouseClicked(float f, float f2, int n, boolean bl) {
         this.filter.handleElementMouseClicked(f, f2, n, bl);
-        if (this.filter.isFocused() && n == 1 && this.filter.getText().equals("")) {
+        if (this.filter.isFocused() && n == Mouse.MOUSE_BUTTON_RIGHT && this.filter.getText().equals("")) {
             this.updateElementSize();
         }
         if (!bl) {
@@ -259,9 +274,12 @@ public class RadioElement extends DraggableElement {
         }
         boolean bl2 = this.isMouseInside(f, f2) && f > this.x + (float) 34 && f < this.x + (float) 44 && f2 < this.y + this.newHeight;
         if (bl2) {
+//            System.out.println("Mouse clicked on play/pause button currently playing station: " + CheatBreaker.getInstance().getRadioManager().getCurrentStation().getName());
             if (!DashUtil.isPlayerNotNull()) {
+//                System.out.println("Playing radio stream");
                 CheatBreaker.getInstance().getRadioManager().getCurrentStation().playStream();
             } else {
+//                System.out.println("Pausing radio stream");
                 DashUtil.end();
             }
         }

@@ -10,6 +10,7 @@ import cc.vops.cheatbreaker.client.ui.module.CBProfileCreateGui;
 import cc.vops.cheatbreaker.client.ui.overlay.Alert;
 import cc.vops.cheatbreaker.client.util.Matrix3x2fStackDebug;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.mixin.debug.Matrix3x2fStackAccessor;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -80,6 +81,7 @@ public abstract class AbstractGui extends Screen {
             CheatBreaker.getInstance().getEventBus().callEvent(new RenderPreviewEvent(gfx, null));
         }
 
+        GuiBridge.ensureTextInput(this);
         float scale = CheatBreaker.getScaleFactor();
 
         int before = ((Matrix3x2fStackAccessor) gfx.pose()).getCurr();
@@ -160,24 +162,14 @@ public abstract class AbstractGui extends Screen {
     protected void onMouseClicked(float mx, float my, int button, AbstractElement... ignore) {
         List<AbstractElement> ignoreList = Arrays.asList(ignore);
 
-        AbstractElement clickedBringToFront = null;
+        AbstractElement clickedBringToFront;
 
-        // Iterate from top-most to bottom-most
         for (int i = elements.size() - 1; i >= 0; i--) {
             AbstractElement element = elements.get(i);
+            if (ignoreList.contains(element)) continue;
+            if (!element.isMouseInside(mx, my)) continue;
 
-            // Skip ignored elements
-            if (ignoreList.contains(element))
-                continue;
-
-            // Skip if mouse not inside
-            if (!element.isMouseInside(mx, my))
-                continue;
-
-            // Element is under mouse: try clicking
             boolean consumed = element.handleElementMouseClicked(mx, my, button, this.mouseClicked(element, mx, my, ignore));
-
-            // Bring this element to front if pressed (like old cheatbreaker)
             clickedBringToFront = element;
 
             if (consumed && elements.contains(clickedBringToFront)) {
@@ -234,11 +226,12 @@ public abstract class AbstractGui extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        elements.forEach(e -> e.handleElementKeyTyped(event.key(), event.scancode(), event.modifiers()));
+        elements.forEach(e -> e.handleElementKeyTyped(event.key(), 0, event.modifiers()));
         return super.keyPressed(event);
     }
     @Override
     public boolean charTyped(CharacterEvent p_425889_) {
+//        System.out.println("Char typed: " + p_425889_.codepoint() + " with chat: " + p_425889_.isAllowedChatCharacter());
         this.onKeyTyped(p_425889_.codepoint(), p_425889_.codepoint());
         return super.charTyped(p_425889_);
     }

@@ -72,10 +72,10 @@ public abstract class AbstractScrollableElement extends AbstractModulesGuiElemen
         this.bottom = true;
         boolean bl = this.scrollHeight > this.height;
         graphics.pose().popMatrix();
-        if (!(!this.hovering || Mouse.isButtonDown(0))) {
+        if (!(!this.hovering || Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT))) {
             this.hovering = false;
         }
-        if (this.hovering && !Mouse.isButtonDown(0)) {
+        if (this.hovering && !Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
             this.hovering = false;
         }
         double d = this.height - 10;
@@ -87,12 +87,12 @@ public abstract class AbstractScrollableElement extends AbstractModulesGuiElemen
             int n3 = this.height;
             boolean bl4 = (float)mouseX > (float)(this.x + this.width - 9) * this.scale && (float)mouseX < (float)(this.x + this.width - 3) * this.scale && (double)mouseY > ((double)(this.y + 11) - d5) * (double)this.scale && (double)mouseY < ((double)(this.y + 8) + d4 - d5) * (double)this.scale;
             boolean bl3 = (float)mouseX > (float)(this.x + this.width - 9) * this.scale && (float)mouseX < (float)(this.x + this.width - 3) * this.scale && (float)mouseY > (float)(this.y + 11) * this.scale && (double)mouseY < ((double)(this.y + 6) + d - (double)3) * (double)this.scale;
-            if (Mouse.isButtonDown(0) && !this.hovering && bl3) {
+            if (Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT) && !this.hovering && bl3) {
                 this.hovering = true;
                 this.scrollPosition = my;
             }
 
-            if (this.hovering && Mouse.isButtonDown(0)) {
+            if (this.hovering && Mouse.isButtonDown(Mouse.MOUSE_BUTTON_LEFT)) {
                 this.scrollAmount = (int) (this.scrollAmount - ((int)(my - this.scrollPosition) * ((double) this.scrollHeight / d)));
                 this.scrollPosition = my;
             } else if (this.hovering) {

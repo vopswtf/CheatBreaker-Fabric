@@ -1,11 +1,12 @@
 package cc.vops.cheatbreaker.client.module.type;
 
+
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.event.type.GameTickEvent;
 import cc.vops.cheatbreaker.client.event.type.GuiDrawEvent;
 import cc.vops.cheatbreaker.client.event.type.RenderPreviewEvent;
-import cc.vops.cheatbreaker.client.event.type.WindowTickEvent;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.module.CBPositionEnum;
 import cc.vops.cheatbreaker.client.ui.module.GuiAnchor;
@@ -75,7 +76,7 @@ public class PotionStatusModule extends AbstractModule {
         if (this.minecraft.player == null) return;
         GuiGraphicsExtractor gfx = guiDrawEvent.getGraphics();
         gfx.pose().pushMatrix();
-        if ((Boolean) this.showWhileTying.getValue() || !(this.minecraft.screen instanceof ChatScreen)) {
+        if ((Boolean) this.showWhileTying.getValue() || !(GuiBridge.getScreen() instanceof ChatScreen)) {
             gfx.pose().pushMatrix();
             Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
             if (collection.isEmpty()) {
@@ -148,7 +149,8 @@ public class PotionStatusModule extends AbstractModule {
                 }
             }
 
-            Identifier icon = Gui.getMobEffectSprite(potionEffect.getEffect());
+//            Identifier icon = Gui.getMobEffectSprite(potionEffect.getEffect());
+            Identifier icon = GuiBridge.getMobEffectSprite(potionEffect.getEffect());
             if (position == CBPositionEnum.RIGHT) {
                 gfx.blitSprite(RenderPipelines.GUI_TEXTURED, icon, (int) (width - 20), (n6 * 22), 18, 18);
             } else if (position == CBPositionEnum.LEFT) {

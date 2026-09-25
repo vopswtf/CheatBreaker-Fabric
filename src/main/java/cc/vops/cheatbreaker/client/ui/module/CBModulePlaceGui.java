@@ -3,6 +3,7 @@ package cc.vops.cheatbreaker.client.ui.module;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
 import cc.vops.cheatbreaker.client.ui.AbstractGui;
+import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
@@ -63,7 +64,7 @@ public class CBModulePlaceGui extends AbstractGui {
             this.module.setAnchor(hoveredAnchor);
             this.module.setTranslations(0.0f, 0.0f);
         }
-        if (!Mouse.isButtonDown(1)) {
+        if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT)) {
             gfx.pose().pushMatrix();
             gfx.pose().scale(f2);
             RenderUtil.drawRoundedRect(gfx, 2, 0.0, 1.8636363192038112 * 1.3414634466171265, n4, 0.0, -15599126);
@@ -74,7 +75,7 @@ public class CBModulePlaceGui extends AbstractGui {
         }
         float f4 = (float) mouseX - arrf[0] - arrf2[0];
         float f5 = (float) mouseY - arrf[1] - arrf2[1];
-        if (!Mouse.isButtonDown(1)) {
+        if (!Mouse.isButtonDown(Mouse.MOUSE_BUTTON_RIGHT)) {
             float[] arrf3 = this.module.getScaledPoints(false);
             f4 = this.getXTranslation(this.module, f4, arrf3, (float)((int)(this.module.width * (Float) this.module.scale.getValue())));
             f5 = this.getYTranslation(this.module, f5, arrf3, (float)((int)(this.module.height * (Float) this.module.scale.getValue())));
@@ -111,13 +112,13 @@ public class CBModulePlaceGui extends AbstractGui {
 
     @Override
     protected boolean onMouseClicked(double mx, double my, int button) {
-        if (button != 0) return false;
+        if (button != Mouse.MOUSE_BUTTON_LEFT) return false;
         GuiAnchor cBGuiAnchor = CBAnchorHelper.getAnchor((float)mx, (float)my, this);
         this.module.setAnchor(cBGuiAnchor);
         CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
         this.module.setState(true);
         CBModulesGui modulesGui = new CBModulesGui();
-        this.mc.setScreen(modulesGui);
+        GuiBridge.setScreen(modulesGui);
         modulesGui.currentScrollableElement = modulesGui.modulesElement;
         modulesGui.currentScrollableElement.bottom = false;
         modulesGui.currentScrollableElement.scrollAmount = this.eventButton.modulesElement.scrollAmount;
