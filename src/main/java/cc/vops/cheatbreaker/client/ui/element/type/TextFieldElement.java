@@ -61,13 +61,12 @@ public class TextFieldElement extends AbstractModulesGuiElement {
         if (textInputBar.isFocused()) {
             if (Keyboard.takeCharacterEvent() instanceof CharacterEvent(int codepoint)) {
                 textInputBar.handleCharInput((char) codepoint, 0);
+                this.setting.setValue(textInputBar.getText());
             } else {
                 if (Keyboard.takeKeyEvent() instanceof KeyEvent keyEvent) {
-//                    System.out.println("Key event: " + keyEvent.input() + " modifiers: " + keyEvent.modifiers());
                     if (keyEvent.input() == InputConstants.KEY_RETURN) { // confirm
                         this.setting.setValue(textInputBar.getText());
                         textInputBar.setFocused(false);
-                        CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
                         return;
                     }
 
@@ -77,14 +76,20 @@ public class TextFieldElement extends AbstractModulesGuiElement {
 
             textInputBar.handleElementUpdate();
         } else if (awaitingKeybind) {
-            if (Mouse.mouseSideButton1Down) {
-                this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_SIDE1);
-                this.awaitingKeybind = false;
-                CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            } else if (Mouse.mouseSideButton2Down) {
-                this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_SIDE2);
-                this.awaitingKeybind = false;
-                CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+            if (setting.isAllowMouseKeybinding()) {
+                if (Mouse.mouseSideButton1Down) {
+                    this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_SIDE1);
+                    this.awaitingKeybind = false;
+                    CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                } else if (Mouse.mouseSideButton2Down) {
+                    this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_SIDE2);
+                    this.awaitingKeybind = false;
+                    CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                } else if (Mouse.mouseMiddleDown) {
+                    this.setting.setKeyCode(-Mouse.MOUSE_BUTTON_MIDDLE);
+                    this.awaitingKeybind = false;
+                    CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                }
             }
 
             if (Keyboard.takeKeyEvent() instanceof KeyEvent keyEvent) {

@@ -53,10 +53,10 @@ public abstract class AvatarRendererMixin {
             Component component = nametagLines.get(i);
             submitNodeCollector.submitNameTag(
                     //? if >=26.2 {
-                    poseStack, renderState.nameTagAttachment, yOffset, component, !renderState.isDiscrete, renderState.lightCoords, cameraRenderState
-                    //? } else {
-                    /*poseStack, renderState.nameTagAttachment, yOffset, component, !renderState.isDiscrete, renderState.lightCoords, renderState.distanceToCameraSq, cameraRenderState
-                    *///? }
+                    /*poseStack, renderState.nameTagAttachment, yOffset, component, !renderState.isDiscrete, renderState.lightCoords, cameraRenderState
+                    *///? } else {
+                    poseStack, renderState.nameTagAttachment, yOffset, component, !renderState.isDiscrete, renderState.lightCoords, renderState.distanceToCameraSq, cameraRenderState
+                    //? }
             );
             yOffset -= LINE_SPACING;
         }

@@ -36,6 +36,7 @@
         "MouseHandlerMixin",
         "NetHandlerMixin",
         "OnlineServerEntryMixin",
+        "OptionInstanceMixin",
         "OptionsMixin",
         "PauseScreenMixin",
         "PlayerModelMixin",

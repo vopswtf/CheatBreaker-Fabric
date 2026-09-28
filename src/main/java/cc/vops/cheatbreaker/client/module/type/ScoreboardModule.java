@@ -148,21 +148,21 @@ public class ScoreboardModule extends AbstractModule {
 
 
 //? if >=26.2 {
-        PlayerTeam playerTeam = scoreboard.getPlayersTeam(this.minecraft.player.getScoreboardName());
+        /*PlayerTeam playerTeam = scoreboard.getPlayersTeam(this.minecraft.player.getScoreboardName());
         if (playerTeam != null) {
             Optional<TeamColor> teamColor = playerTeam.getColor();
             if (teamColor.isPresent()) {
                 objective = scoreboard.getDisplayObjective((teamColor.get()).displaySlot());
             }
         }
-//? } else {
-        /*if (playerteam != null) {
+*///? } else {
+        if (playerteam != null) {
             DisplaySlot displayslot = DisplaySlot.teamColorToSlot(playerteam.getColor());
             if (displayslot != null) {
                 objective = scoreboard.getDisplayObjective(displayslot);
             }
         }
-*///? }
+//? }
 
         return objective != null ? objective : scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR);
     }

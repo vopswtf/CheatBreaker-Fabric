@@ -22,10 +22,10 @@ import org.joml.*;
 import java.lang.Math;
 
 //? if >= 26.3 {
-import com.mojang.renderpearl.api.pipeline.*;
-//? } else {
-/*import com.mojang.blaze3d.platform.CompareOp;
-*///? }
+/*import com.mojang.renderpearl.api.pipeline.*;
+*///? } else {
+import com.mojang.blaze3d.platform.CompareOp;
+//? }
 
 //? if 26.2 {
 /*import com.mojang.blaze3d.PrimitiveTopology;
@@ -400,7 +400,7 @@ public class RenderUtil {
     }
 
     //? if >=26.2 {
-    public static final RenderPipeline ARROW_PIPELINE =
+    /*public static final RenderPipeline ARROW_PIPELINE =
             RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
                     .withLocation("pipeline/cb_lines")
                     .withVertexShader("core/position_color")
@@ -421,8 +421,8 @@ public class RenderUtil {
                             )
                     )
                     .build();
-    //? } else {
-    /*public static final RenderPipeline ARROW_PIPELINE =
+    *///? } else {
+    public static final RenderPipeline ARROW_PIPELINE =
             RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET, RenderPipelines.GLOBALS_SNIPPET)
                     .withLocation("pipeline/cb_lines")
                     .withVertexShader("core/position_color")
@@ -442,7 +442,7 @@ public class RenderUtil {
                             )
                     )
                     .build();
-    *///? }
+    //? }
 
     static {
         RenderPipelines.register(ARROW_PIPELINE);

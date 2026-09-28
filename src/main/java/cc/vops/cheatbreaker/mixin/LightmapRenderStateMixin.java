@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LightmapRenderStateExtractor.class)
 public class LightmapRenderStateMixin {
-    @ModifyExpressionValue(method = "extract", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"))
+    @ModifyExpressionValue(method = "extract", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 0))
     private float modifyBrightness(float original, LightmapRenderState renderState, float partialTicks) {
         if (CheatBreaker.getInstance().getGlobalSettings().fullBright.getAsBoolean()) {
             return 10000000f;

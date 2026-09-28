@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
 //? if >=26.2 {
-import net.minecraft.world.entity.EntityTypes;
-//? }
+/*import net.minecraft.world.entity.EntityTypes;
+*///? }
 
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
@@ -33,17 +33,17 @@ public class LivingEntityRendererMixin {
     private void shouldShowName(LivingEntity entity, double squaredDistanceToCamera, CallbackInfoReturnable<Boolean> cir) {
 
         //? if >=26.2 {
-        if (entity.getType() != EntityTypes.PLAYER) return;
-        //? } else {
-        /*if (entity.getType() != EntityType.PLAYER) return;
-        *///? }
+        /*if (entity.getType() != EntityTypes.PLAYER) return;
+        *///? } else {
+        if (entity.getType() != EntityType.PLAYER) return;
+        //? }
 
         if (CheatBreaker.getInstance().getGlobalSettings().showSelfNametag.getAsBoolean() && entity == Minecraft.getInstance().player) {
             //? if >=26.2 {
-            boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityTypes.TEXT_DISPLAY);
-            //? } else {
-            /*boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityType.TEXT_DISPLAY);
-            *///? }
+            /*boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityTypes.TEXT_DISPLAY);
+            *///? } else {
+            boolean hasDisplayRiding = !entity.getPassengers().isEmpty() && entity.getPassengers().stream().anyMatch(passenger -> passenger.getType() == EntityType.TEXT_DISPLAY);
+            //? }
 
             if (!hasDisplayRiding) cir.setReturnValue(true);
         }

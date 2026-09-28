@@ -33,6 +33,8 @@ public class Setting {
     private AbstractModule container;
     public boolean rainbow;
     public int[] colorArray;
+    @Getter
+    private boolean hidden = false;
 
     @Getter @Setter
     private boolean editableString = false;
@@ -150,6 +152,11 @@ public class Setting {
 
     public Setting onChange(Consumer<Object> consumer) {
         this.valueConsumer = consumer;
+        return this;
+    }
+
+    public Setting setHidden(boolean hidden) {
+        this.hidden = hidden;
         return this;
     }
 

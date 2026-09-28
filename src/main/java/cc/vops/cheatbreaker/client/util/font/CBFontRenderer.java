@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 //? if >=26.3 {
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-//? } else {
-/*import com.mojang.blaze3d.pipeline.RenderPipeline;
-*///? }
+/*import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+*///? } else {
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+//? }
 
 // credit claude LOL
 public class CBFontRenderer {

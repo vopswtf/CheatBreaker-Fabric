@@ -59,10 +59,10 @@ public class MouseHandlerMixin {
 
     @Inject(method = "onMove", at = @At("RETURN"))
     //? if >=26.3 {
-    private void onMove(long handle, double xpos, double ypos, double xrel, double yrel, CallbackInfo ci) {
-    //? } else {
-    /*private void onMove(long window, double xPos, double yPos, CallbackInfo callbackInfo) {
-    *///? }
+    /*private void onMove(long handle, double xpos, double ypos, double xrel, double yrel, CallbackInfo ci) {
+    *///? } else {
+    private void onMove(long window, double xPos, double yPos, CallbackInfo callbackInfo) {
+    //? }
         Mouse.mouseX = xpos;
         Mouse.mouseY = ypos;
     }

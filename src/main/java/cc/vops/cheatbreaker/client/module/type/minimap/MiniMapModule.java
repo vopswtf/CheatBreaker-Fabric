@@ -11,6 +11,9 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public class MiniMapModule extends AbstractModule {
     public Minimap minimap;
 
+    public final Setting showBeams;
+    public final Setting showNames;
+    public final Setting showCircle;
     public final Setting abbreviateNames;
     public final Setting showCardinalDirections;
     public final Setting enableBiomeBlending;
@@ -36,7 +39,10 @@ public class MiniMapModule extends AbstractModule {
 
         new Setting(this, "label").setValue("General Options");
         {
-            this.abbreviateNames = new Setting(this, "Abbreviate Names").setValue(true);
+            this.showBeams = new Setting(this, "Show Beams").setValue(true);
+            this.showNames = new Setting(this, "Show Names").setValue(true);
+            this.showCircle = new Setting(this, "Show Circle").setValue(true);
+            this.abbreviateNames = new Setting(this, "Abbreviate Names").setValue(false);
             this.waypointNameScale = new Setting(this, "Waypoint Name Scale").setValue(1.0f).setMinMax(0.5f, 2.0f);
         }
 

@@ -28,6 +28,7 @@ import lombok.Setter;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
@@ -119,7 +120,6 @@ public class ApolloNetHandler {
     }
 
     public void reset() {
-        System.out.println("ApolloNetHandler reset");
         this.adventureNametagOverrides.clear();
         this.currentTeam = null;
         this.worldName = "";
@@ -193,6 +193,10 @@ public class ApolloNetHandler {
 
     public static UUID convertApolloUUID(Uuid apolloUuid) {
         return new UUID(apolloUuid.getHigh64(), apolloUuid.getLow64());
+    }
+
+    public static Uuid convertToApolloUUID(UUID uuid) {
+        return Uuid.newBuilder().setHigh64(uuid.getMostSignificantBits()).setLow64(uuid.getLeastSignificantBits()).build();
     }
 
     public static net.minecraft.network.chat.Component parseComponent(String rawJson) {

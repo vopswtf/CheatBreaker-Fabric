@@ -13,18 +13,18 @@ public class Mouse {
     public static double mouseY = 0;
 
     //? if >= 26.3 {
-    public static final int MOUSE_BUTTON_LEFT = InputConstants.MOUSE_BUTTON_LEFT;
+    /*public static final int MOUSE_BUTTON_LEFT = InputConstants.MOUSE_BUTTON_LEFT;
     public static final int MOUSE_BUTTON_RIGHT = InputConstants.MOUSE_BUTTON_RIGHT;
     public static final int MOUSE_BUTTON_MIDDLE = InputConstants.MOUSE_BUTTON_MIDDLE;
     public static final int MOUSE_BUTTON_SIDE1 = InputConstants.MOUSE_BUTTON_4;
     public static final int MOUSE_BUTTON_SIDE2 = InputConstants.MOUSE_BUTTON_5;
-    //? } else {
-    /*public static final int MOUSE_BUTTON_LEFT = 0;
+    *///? } else {
+    public static final int MOUSE_BUTTON_LEFT = 0;
     public static final int MOUSE_BUTTON_RIGHT = 1;
     public static final int MOUSE_BUTTON_MIDDLE = 2;
     public static final int MOUSE_BUTTON_SIDE1 = 3;
     public static final int MOUSE_BUTTON_SIDE2 = 4;
-    *///? }
+    //? }
 
     public static boolean isButtonDown(int button) {
         return switch (button) {

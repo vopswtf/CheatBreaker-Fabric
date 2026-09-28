@@ -18,9 +18,10 @@ public class AutoHotKeyModule extends AbstractModule {
     // make sure module is empty constructor
     public AutoHotKeyModule() {
         super("Auto Text Hotkey");
+        this.scale.setHidden(true);
+
         this.setDefaultState(false); // Default state of module
         this.setPreviewLabel("/team rally", 1.4F); // Preview label, use setPreviewIcon for an icon instead (Identifier)
-        this.getSettingsList().clear(); // This removes the scale setting that is added by default, not required if you aren't rendering any GUI
 
         for (int i = 0; i < 10; i++) {
             Setting hotkey = new Setting(this, "Hotkey " + (i + 1)).setValue("/command").setUnboundKeyCode().setAllowMouseKeybinding(true);

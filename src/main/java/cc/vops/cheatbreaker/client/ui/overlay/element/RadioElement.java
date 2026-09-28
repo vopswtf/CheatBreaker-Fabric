@@ -153,13 +153,13 @@ public class RadioElement extends DraggableElement {
             if (Fonts.playRegular16.canDisplay(string)) {
                 RenderUtil.drawString(gfx, Fonts.playRegular16, sliceString(string, 125), f3, this.y + (float)4, -1);
             } else {
-                RenderUtil.drawString(gfx, Minecraft.getInstance().font, sliceString(string, 125), f3, this.y + (float)4, -1);
+                RenderUtil.drawString(gfx, Minecraft.getInstance().font, sliceString(string, 100), f3, this.y + (float)4, -1);
             }
 
             if (Fonts.playRegular12.canDisplay(under)) {
                 RenderUtil.drawString(gfx, Fonts.playRegular12, sliceString(under, 125), f3, this.y + (float)17, -1342177281);
             } else {
-                RenderUtil.drawString(gfx, Minecraft.getInstance().font, sliceString(under, 125), f3, this.y + (float)17, -1342177281);
+                RenderUtil.drawString(gfx, Minecraft.getInstance().font, sliceString(under, 100), f3, this.y + (float)17, -1342177281);
             }
         }
         float f4 = this.fade.inOutFade(this.isMouseInside(f, f2) && bl);

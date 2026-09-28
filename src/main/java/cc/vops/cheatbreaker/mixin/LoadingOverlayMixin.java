@@ -114,10 +114,10 @@ public class LoadingOverlayMixin {
         } else {
 
             //? if >=26.2 {
-            ARGB.setVector4fFromARGB32(this.minecraft.gameRenderer.gameRenderState().guiRenderState.clearColorOverride, BRAND_BACKGROUND.getAsInt());
-            //? } else {
-            /*GameRendererBridge.getGameRenderState().guiRenderState.clearColorOverride = BRAND_BACKGROUND.getAsInt();
-            *///? }
+            /*ARGB.setVector4fFromARGB32(this.minecraft.gameRenderer.gameRenderState().guiRenderState.clearColorOverride, BRAND_BACKGROUND.getAsInt());
+            *///? } else {
+            GameRendererBridge.getGameRenderState().guiRenderState.clearColorOverride = BRAND_BACKGROUND.getAsInt();
+            //? }
             f2 = 1.0F;
         }
 

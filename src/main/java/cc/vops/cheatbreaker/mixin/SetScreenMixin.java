@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >=26.2 {
-import net.minecraft.client.gui.Gui;
+/*import net.minecraft.client.gui.Gui;
 @Mixin(Gui.class)
-//? } else {
-/*@Mixin(Minecraft.class)
-*///? }
+*///? } else {
+@Mixin(Minecraft.class)
+//? }
 
 public class SetScreenMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)

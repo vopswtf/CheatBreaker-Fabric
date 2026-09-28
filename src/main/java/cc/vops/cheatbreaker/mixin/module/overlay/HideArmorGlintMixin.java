@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class HideArmorGlintMixin {
 
     //? if >=26.3 {
-    @ModifyVariable(
+    /*@ModifyVariable(
             method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
             at = @At("STORE"),
             name = "hasFoil"
@@ -24,8 +24,8 @@ public class HideArmorGlintMixin {
 
         return hasFoil;
     }
-    //? } else {
-    /*@ModifyVariable(
+    *///? } else {
+    @ModifyVariable(
             method = "renderLayers(Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lnet/minecraft/world/item/ItemStack;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/resources/Identifier;II)V",
             at = @At("STORE"),
             name = "renderFoil"
@@ -36,5 +36,5 @@ public class HideArmorGlintMixin {
         }
         return original;
     }
-    *///? }
+    //? }
 }

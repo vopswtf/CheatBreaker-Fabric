@@ -49,7 +49,7 @@ public abstract class CapeLayerMixin {
 
 
                     //? if >=26.3 {
-                    p_430860_.submitModel(
+                    /*p_430860_.submitModel(
                             this.model,
                             p_428454_,
                             pose,
@@ -62,8 +62,8 @@ public abstract class CapeLayerMixin {
                             null,
                             p_428454_.outlineColor
                     );
-                    //? } else {
-                    /*p_430860_.submitModel(
+                    *///? } else {
+                    p_430860_.submitModel(
                             this.model,
                             p_428454_,
                             pose,
@@ -75,7 +75,7 @@ public abstract class CapeLayerMixin {
                             p_428454_.outlineColor,
                             null
                     );
-                    *///? }
+                    //? }
                     pose.popPose();
                 }
             }
@@ -92,7 +92,7 @@ public abstract class CapeLayerMixin {
             CosmeticModels.WINGS.setupAnim(p_428454_);
 
             //? if >=26.3 {
-            p_430860_.submitModel(
+            /*p_430860_.submitModel(
                     CosmeticModels.WINGS,
                     p_428454_,
                     pose,
@@ -103,8 +103,8 @@ public abstract class CapeLayerMixin {
                     null,
                     p_428454_.outlineColor
             );
-            //? } else {
-            /*p_430860_.submitModel(
+            *///? } else {
+            p_430860_.submitModel(
                     CosmeticModels.WINGS,
                     p_428454_,
                     pose,
@@ -114,7 +114,7 @@ public abstract class CapeLayerMixin {
                     p_428454_.outlineColor,
                     null
             );
-            *///? }
+            //? }
 
             pose.scale(1.0F, 1.0F, 1.0F);
             pose.popPose();

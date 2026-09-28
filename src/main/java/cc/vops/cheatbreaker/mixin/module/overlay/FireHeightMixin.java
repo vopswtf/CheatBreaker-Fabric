@@ -12,24 +12,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if <26.2 {
-/*import net.minecraft.client.renderer.MultiBufferSource;
-*///? }
+import net.minecraft.client.renderer.MultiBufferSource;
+//? }
 
 @Mixin(ScreenEffectRenderer.class)
 public class FireHeightMixin {
     //? if >=26.2 {
-    @Inject(method = "buildFireQuad", at = @At("HEAD"))
+    /*@Inject(method = "buildFireQuad", at = @At("HEAD"))
     private static void renderFire(TextureAtlasSprite sprite, VertexConsumer builder, Matrix4f pose, CallbackInfo ci) {
         if (OverlayModule.instance != null && OverlayModule.instance.isEnabled() && OverlayModule.instance.getFireHeight().getAsFloat() != 1f) {
             pose.translate(0f, OverlayModule.instance.getFireHeight().getAsFloat() - 1f, 0f);
         }
     }
-    //? } else {
-    /*@Inject(method = "renderFire", at = @At("HEAD"))
+    *///? } else {
+    @Inject(method = "renderFire", at = @At("HEAD"))
     private static void renderFire(PoseStack pose, MultiBufferSource bufferSource, TextureAtlasSprite sprite, CallbackInfo ci) {
         if (OverlayModule.instance != null && OverlayModule.instance.isEnabled() && OverlayModule.instance.getFireHeight().getAsFloat() != 1f) {
             pose.translate(0f, OverlayModule.instance.getFireHeight().getAsFloat() - 1f, 0f);
         }
     }
-    *///? }
+    //? }
 }

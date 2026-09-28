@@ -117,11 +117,11 @@ public class SliderElement extends AbstractModuleTypeElement {
     void onUpdate() {
         switch (this.setting.getType()) {
             case INTEGER: {
-                this.setting.setValue(Integer.parseInt((int)this.value + ""));
+                this .setting.setValue(Integer.parseInt((int)this.value + ""));
                 break;
             }
             case FLOAT: {
-                this.setting.setValue(this.value);
+                this.setting.setValue(Float.parseFloat(this.value + ""));
                 break;
             }
             case DOUBLE: {

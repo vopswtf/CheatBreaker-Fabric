@@ -25,6 +25,7 @@ import com.mojang.logging.LogUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
@@ -90,6 +91,9 @@ public class CheatBreaker implements ModInitializer {
     }
 
     public void onLoad() {
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> this.onShutdown());
+        Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown, "cheatbreaker-shutdown-hook"));
+
         this.initAudioDevices();
         if (!audioDevices.isEmpty()) {
             LOGGER.info("Initialized all audio devices.");
@@ -129,7 +133,9 @@ public class CheatBreaker implements ModInitializer {
     private boolean enabled = true;
 
     public void onShutdown() {
+        if (!this.enabled) return;
         this.enabled = false;
+        CheatBreaker.LOGGER.info("Shutting down CheatBreaker...");
 
         if (this.assetsWebSocket != null) {
             try {

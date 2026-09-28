@@ -5,10 +5,13 @@ import cc.vops.cheatbreaker.client.nethandler.apollo.ApolloNetHandler;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import com.lunarclient.apollo.button.v1.Button;
 import com.lunarclient.apollo.button.v1.ButtonContentPart;
-import com.lunarclient.apollo.button.v1.ButtonShape;
+import com.lunarclient.apollo.button.v1.*;
 import com.lunarclient.apollo.chat.v1.ChatButton;
+import com.lunarclient.apollo.common.v1.*;
 import com.lunarclient.apollo.common.v1.Icon;
 import com.lunarclient.apollo.common.v1.ItemStackIcon;
+import com.lunarclient.apollo.hud.v1.*;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -38,9 +41,42 @@ import java.util.Optional;
 public class ChatScreenMixin {
 
     @Inject(method = "extractRenderState", at = @At("HEAD"))
-    private void onExtractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a, CallbackInfo ci) {
-        if (CheatBreaker.getInstance().getApolloNetHandler().getCurrentChatButtons().isEmpty()) return;
+    private void onExtractRenderState(final GuiGraphicsExtractor graphics, final int mx, final int my, final float a, CallbackInfo ci) {
+        if (FabricLoader.getInstance().isDevelopmentEnvironment() && CheatBreaker.getInstance().getApolloNetHandler().getCurrentChatButtons().isEmpty()) {
+            CheatBreaker.getInstance().getApolloNetHandler().getCurrentChatButtons().add(ChatButton.newBuilder()
+                    .setButton(Button.newBuilder()
+                            .setId("team-chat")
+                            .setPosition(HudPosition.newBuilder().setX(0).setY(2).build())
+                            .setSize(ButtonSize.newBuilder().setWidth(70).setHeight(16).build())
+                            .setShape(ButtonShape.BUTTON_SHAPE_ROUNDED_SQUARE)
+                            .setBackgroundColor(Color.newBuilder().setColor(0xFF000000).build())
+                            .setBorderColor(Color.newBuilder().setColor(0xFF000000).build())
+                            .setContent(ButtonContent.newBuilder()
+                                    .addParts(ButtonContentPart.newBuilder()
+                                            .setIcon(Icon.newBuilder()
+                                                    .setItemStack(ItemStackIcon.newBuilder()
+                                                            .setItemName("paper")
+                                                    .build())
+                                            .build()))
+                                    .addParts(ButtonContentPart.newBuilder()
+                                            .setAdventureJsonText("{\"text\":\"Team\",\"color\":\"white\"}")
+                                            .build())
+                                    .setScale(1.0F)
+                                    .build())
+                            .setTooltip(ButtonTooltip.newBuilder()
+                                    .addAdventureJsonLines("{\"text\":\"Click to chat with your team!\",\"color\":\"yellow\"}")
+                                    .build())
+                            .setRunCommand("/channel team")
+                            .build())
+                    .build());
+        }
+
         ScreenRectangle rectangle = ((Screen) (Object) this).getRectangle();
+        if (CheatBreaker.getInstance().getApolloNetHandler().getCurrentChatButtons().isEmpty()) return;
+
+        float scale = CheatBreaker.getScaleFactor();
+        float mouseX = mx;
+        float mouseY = my;
 
         int topRegion = rectangle.height() - 40;
         int bottomRegion = rectangle.height() - 14;
@@ -50,6 +86,7 @@ public class ChatScreenMixin {
 
         Font font = Minecraft.getInstance().font;
 
+        graphics.pose().pushMatrix();
         graphics.enableScissor(2, topRegion, rectangle.width() - 2, bottomRegion);
         for (ChatButton chatButton : CheatBreaker.getInstance().getApolloNetHandler().getCurrentChatButtons()) {
             if (!chatButton.hasButton()) continue;
@@ -110,6 +147,7 @@ public class ChatScreenMixin {
             x += btnWidth + 4;
         }
         graphics.disableScissor();
+        graphics.pose().popMatrix();
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
@@ -145,7 +183,7 @@ public class ChatScreenMixin {
     }
 
     @Unique
-    private void drawTooltip(GuiGraphicsExtractor graphics, Button button, int mouseX, int mouseY, Button button1) {
+    private void drawTooltip(GuiGraphicsExtractor graphics, Button button, float mouseX, float mouseY, Button button1) {
         if (button.hasTooltip() && button.getTooltip().getAdventureJsonLinesCount() > 0) {
             List<Component> lines = button.getTooltip().getAdventureJsonLinesList().stream().map(ApolloNetHandler::parseComponent).toList();
 
@@ -153,7 +191,7 @@ public class ChatScreenMixin {
                     Minecraft.getInstance().font,
                     lines,
                     Optional.empty(),
-                    mouseX, mouseY
+                    (int)mouseX, (int)mouseY
             );
         }
     }

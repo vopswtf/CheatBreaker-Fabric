@@ -51,6 +51,7 @@ public class ModuleListElement extends AbstractScrollableElement {
             if (object.isStaffModule() && !object.isStaffEnabledModule()) continue;
             ArrayList<AbstractModulesGuiElement> elements = new ArrayList<>();
             for (Setting setting : object.getSettingsList()) {
+                if (setting.isHidden()) continue;
                 switch (setting.getType()) {
                     case BOOLEAN: {
                         elements.add(new ToggleElement(setting, f));

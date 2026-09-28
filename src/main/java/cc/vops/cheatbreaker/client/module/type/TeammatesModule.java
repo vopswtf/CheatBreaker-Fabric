@@ -4,12 +4,14 @@ import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.nethandler.apollo.ApolloNetHandler;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.bridge.GameRendererBridge;
+import com.lunarclient.apollo.common.v1.Location;
 import com.lunarclient.apollo.team.v1.TeamMember;
 import com.lunarclient.apollo.team.v1.UpdateTeamMembersMessage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -19,6 +21,8 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TeammatesModule {
@@ -29,11 +33,41 @@ public class TeammatesModule {
         });
 
         LevelRenderEvents.COLLECT_SUBMITS.register((context) -> {
+            if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+                var mc = Minecraft.getInstance();
+                if (mc.level == null || mc.player == null) return;
+                double x = mc.player.getX();
+                double y = mc.player.getY();
+                double z = mc.player.getZ();
+
+                List<TeamMember> members = new ArrayList<>();
+
+                for (int i = 0; i < 5; i++) {
+                    int color = (i * 50) % 256;
+                    TeamMember member = TeamMember.newBuilder()
+                            .setPlayerUuid(ApolloNetHandler.convertToApolloUUID(UUID.randomUUID()))
+                            .setLocation(Location.newBuilder()
+                                    .setWorld(CheatBreaker.getInstance().getApolloNetHandler().getWorldName())
+                                    .setX(x + Math.cos(i * Math.PI * 2 / 5) * 5)
+                                    .setY(y)
+                                    .setZ(z + Math.sin(i * Math.PI * 2 / 5) * 5)
+                                    .build())
+                            .setMarkerColor(com.lunarclient.apollo.common.v1.Color.newBuilder().setColor(color))
+                            .build();
+                    members.add(member);
+                }
+
+                CheatBreaker.getInstance().getApolloNetHandler().setCurrentTeam(UpdateTeamMembersMessage.newBuilder().addAllMembers(members).build());
+            }
+
             if (!CheatBreaker.getInstance().getApolloNetHandler().hasTeam()) return;
-            UpdateTeamMembersMessage team = CheatBreaker.getInstance().getApolloNetHandler().getCurrentTeam();
 
             var mc = Minecraft.getInstance();
             if (mc.level == null || mc.player == null) return;
+
+            UpdateTeamMembersMessage team = CheatBreaker.getInstance().getApolloNetHandler().getCurrentTeam();
+            if (team == null) return;
+
             var camera = GameRendererBridge.getGameRenderState().levelRenderState.cameraRenderState;
 
             PoseStack poseStack = context.poseStack();
@@ -90,10 +124,10 @@ public class TeammatesModule {
         poseStack.translate(x, y, z);
 
 //? if >=26.3 {
-        poseStack.mulPose(new Matrix4f().set(GameRendererBridge.getMainCamera().rotation()));
-//? } else {
-        /*poseStack.mulPose(GameRendererBridge.getMainCamera().rotation());
-*///? }
+        /*poseStack.mulPose(new Matrix4f().set(GameRendererBridge.getMainCamera().rotation()));
+*///? } else {
+        poseStack.mulPose(GameRendererBridge.getMainCamera().rotation());
+//? }
 
         poseStack.scale(scale, scale, scale);
 
@@ -108,9 +142,11 @@ public class TeammatesModule {
             buffer.addVertex(matrix, 0f, 0f, 0).setColor(r, g, b, 1f);
             buffer.addVertex(matrix, -diag, -diag, 0).setColor(r, g, b, 1f);
             buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
+            buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
 
             buffer.addVertex(matrix, 0f, 0f, 0).setColor(r, g, b, 1f);
             buffer.addVertex(matrix, diag, -diag, 0).setColor(r, g, b, 1f);
+            buffer.addVertex(matrix, diag, diag, 0).setColor(r, g, b, 1f);
             buffer.addVertex(matrix, diag, diag, 0).setColor(r, g, b, 1f);
         });
 

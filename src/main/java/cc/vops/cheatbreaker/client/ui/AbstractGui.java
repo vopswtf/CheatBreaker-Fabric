@@ -242,7 +242,13 @@ public abstract class AbstractGui extends Screen {
 
     @Override
     protected void extractBlurredBackground(GuiGraphicsExtractor gfx) {
-        if (doBlur()) gfx.blurBeforeThisStratum();
+        if (doBlur()) {
+            try {
+                gfx.blurBeforeThisStratum();
+            } catch (Exception e) {
+                // this will fail if called twice (overlay + menu), fail silent
+            }
+        }
     }
 
     protected void drawElements(GuiGraphicsExtractor gfx, float f, float f2, AbstractElement... elements) {

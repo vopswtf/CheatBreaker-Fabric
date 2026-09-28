@@ -203,9 +203,7 @@ public class ConfigManager {
 
             for (int i = 0; i < module.getSettingsList().size(); i++) {
                 try {
-                    module.getSettingsList().get(i).setValue(
-                            module.getDefaultSettingsValues().get(i), false
-                    );
+                    module.getSettingsList().get(i).setValue(module.getDefaultSettingsValues().get(i), false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

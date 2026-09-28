@@ -126,10 +126,10 @@ public class MainMenuBase extends AbstractGui {
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
             //? if >=26.3 {
-            GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options));
-            //? } else {
-            /*GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options, false));
-            *///? }
+            /*GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options));
+            *///? } else {
+            GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options, false));
+            //? }
             return true;
         } else if (this.exitButton.isMouseInside(mx, my)) {
             this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));

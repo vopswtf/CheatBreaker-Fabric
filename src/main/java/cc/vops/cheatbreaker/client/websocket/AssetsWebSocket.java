@@ -386,7 +386,7 @@ public class AssetsWebSocket extends WebSocketClient {
     }
 
     public void sendClientCosmetics() {
-        System.out.println("Sending cosmetics (" + CheatBreaker.getInstance().getCosmetics().size() + ")");
+//        System.out.println("Sending cosmetics (" + CheatBreaker.getInstance().getCosmetics().size() + ")");
         this.send(new WSPacketClientCosmetics(CheatBreaker.getInstance().getCosmetics()));
     }
 
