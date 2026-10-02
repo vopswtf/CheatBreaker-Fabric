@@ -69,7 +69,7 @@ public class CheatBreaker implements ModInitializer {
 
     private ApolloNetHandler apolloNetHandler;
 
-    private final List<Cosmetic> cosmetics = new ArrayList<>();
+    private final HashMap<UUID, List<Cosmetic>> cosmetics = new HashMap<>();
     private AssetsWebSocket assetsWebSocket;
 
     private final List<Identifier> presetLocations = new ArrayList<>();
@@ -92,7 +92,6 @@ public class CheatBreaker implements ModInitializer {
 
     public void onLoad() {
         ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> this.onShutdown());
-        Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown, "cheatbreaker-shutdown-hook"));
 
         this.initAudioDevices();
         if (!audioDevices.isEmpty()) {
@@ -130,11 +129,8 @@ public class CheatBreaker implements ModInitializer {
         this.friendsManager = new FriendsManager();
     }
 
-    private boolean enabled = true;
 
     public void onShutdown() {
-        if (!this.enabled) return;
-        this.enabled = false;
         CheatBreaker.LOGGER.info("Shutting down CheatBreaker...");
 
         if (this.assetsWebSocket != null) {
@@ -145,16 +141,19 @@ public class CheatBreaker implements ModInitializer {
             }
         }
 
-        configManager.writeProfile(activeProfile.getName());
+        if (activeProfile != null) configManager.writeProfile(activeProfile.getName());
 
         if (voiceChatManager.getThread() != null) voiceChatManager.getThread().interrupt();
         if (voiceChatManager.getThreadUpdate() != null) voiceChatManager.getThreadUpdate().interrupt();
-        if (radioManager.getDashThread() != null) radioManager.getDashThread().interrupt();
-        if (radioManager.getDashQueueThread() != null) radioManager.getDashQueueThread().shutdown();
 
-        if (radioManager.getLocalStation() instanceof LocalStation ls) {
-            if (ls.getMedia() != null) {
-                ls.getMedia().close();
+        if (radioManager != null) {
+            if (radioManager.getDashThread() != null) radioManager.getDashThread().interrupt();
+            if (radioManager.getDashQueueThread() != null) radioManager.getDashQueueThread().shutdown();
+
+            if (radioManager.getLocalStation() instanceof LocalStation ls) {
+                if (ls.getMedia() != null) {
+                    ls.getMedia().close();
+                }
             }
         }
     }
@@ -182,12 +181,18 @@ public class CheatBreaker implements ModInitializer {
     }
 
     public Cosmetic getActiveCosmetic(Cosmetic.CosmeticType type, UUID playerId) {
-        for (Cosmetic cosmetic : this.cosmetics) {
-            if (cosmetic.getType() == type && cosmetic.isEquipped() && cosmetic.getPlayerId().equals(playerId.toString())) {
+        if (!cosmetics.containsKey(playerId)) return null;
+        for (Cosmetic cosmetic : cosmetics.get(playerId)) {
+            if (cosmetic.getType() == type && cosmetic.isEquipped()) {
                 return cosmetic;
             }
         }
         return null;
+    }
+
+    public List<Cosmetic> getLocalCosmetics() {
+        if (!cosmetics.containsKey(Minecraft.getInstance().getUser().getProfileId())) return new ArrayList<>();
+        return cosmetics.get(Minecraft.getInstance().getUser().getProfileId());
     }
 
     public void createNewProfile() {

@@ -17,12 +17,9 @@ public class RadialRenderState extends CircleRenderState {
             float cx, float cy, int color,
             float innerRadius, float outerRadius, float startAngle, float endAngle
     ) {
-        super(
-                new Matrix3x2f(pose), scissorArea,
-                cx, cy, 0, color
-        );
-        this.innerRadius = innerRadius;
+        super(new Matrix3x2f(pose), scissorArea, cx, cy, outerRadius + 1f, color);
         this.outerRadius = outerRadius;
+        this.innerRadius = innerRadius;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }

@@ -2,7 +2,9 @@ package cc.vops.cheatbreaker.mixin;
 
 
 import cc.vops.cheatbreaker.client.config.Setting;
+import cc.vops.cheatbreaker.client.module.ModuleManager;
 import cc.vops.cheatbreaker.client.module.type.AutoHotKeyModule;
+import cc.vops.cheatbreaker.client.module.type.cooldown.CooldownsModule;
 import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.GlobalSettings;
@@ -12,7 +14,12 @@ import cc.vops.cheatbreaker.client.ui.module.CBModulesGui;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
 import cc.vops.cheatbreaker.client.ui.overlay.VoiceChatScreen;
 import cc.vops.cheatbreaker.client.util.Keyboard;
+import com.google.protobuf.Duration;
+import com.lunarclient.apollo.common.v1.Icon;
+import com.lunarclient.apollo.common.v1.ItemStackIcon;
+import com.lunarclient.apollo.cooldown.v1.DisplayCooldownMessage;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.CharacterEvent;
@@ -35,6 +42,15 @@ public class KeyboardHandlerMixin {
             if (action == InputConstants.PRESS && !Keyboard.isKeyDown(InputConstants.KEY_F3)) {
                 Keyboard.setKeyEvent(event);
                 CheatBreaker.getInstance().getEventBus().callEvent(new KeyboardEvent(event));
+
+                if (FabricLoader.getInstance().isDevelopmentEnvironment() && event.key() == InputConstants.KEY_F4) {
+                    DisplayCooldownMessage message = DisplayCooldownMessage.newBuilder()
+                            .setName("enderpearl-cooldown")
+                            .setDuration(Duration.newBuilder().setSeconds(16).build())
+                            .setIcon(Icon.newBuilder().setItemStack(ItemStackIcon.newBuilder().setItemName("ender_pearl").build()))
+                            .build();
+                    ModuleManager.getModule(CooldownsModule.class).addCooldown(message);
+                }
 
                 if (event.key() == GlobalSettings.getKeyCode(CheatBreaker.getInstance().getGlobalSettings().openVoiceMenu)) {
                     if (minecraft.level != null && GuiBridge.getScreen() == null) {

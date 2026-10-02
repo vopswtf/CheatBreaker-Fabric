@@ -113,36 +113,40 @@ public class MainMenuBase extends AbstractGui {
                 -1879048193
         );
 
-        this.exitButton.drawElement(gfx, mouseX, mouseY, true);
-        this.optionsButton.drawElement(gfx, mouseX, mouseY, true);
-        this.cosmeticsButton.drawElement(gfx, mouseX, mouseY, true);
-        this.accountElement.drawElement(gfx, mouseX, mouseY, true);
-        if (GuiBridge.getScreen() instanceof MainMenuBase) this.languageButton.drawElement(gfx, mouseX, mouseY, true);
+        if (minecraft.level == null) {
+            this.exitButton.drawElement(gfx, mouseX, mouseY, true);
+            this.optionsButton.drawElement(gfx, mouseX, mouseY, true);
+            this.cosmeticsButton.drawElement(gfx, mouseX, mouseY, true);
+            this.accountElement.drawElement(gfx, mouseX, mouseY, true);
+        }
+        if (GuiBridge.getScreen() instanceof MainMenu) this.languageButton.drawElement(gfx, mouseX, mouseY, true);
     }
 
     @Override
     protected boolean onMouseClicked(double mx, double my, int button) {
-        if (this.optionsButton.isMouseInside(mx, my)) {
-            this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        if (minecraft.level == null) {
+            if (this.optionsButton.isMouseInside(mx, my)) {
+                this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
-            //? if >=26.3 {
-            /*GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options));
-            *///? } else {
-            GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options, false));
-            //? }
-            return true;
-        } else if (this.exitButton.isMouseInside(mx, my)) {
-            this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            this.minecraft.stop();
-            return true;
-        } else if (this.languageButton.isMouseInside(mx, my)) {
-            this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            GuiBridge.setScreen(new LanguageSelectScreen(GuiBridge.getScreen(), this.minecraft.options, this.minecraft.getLanguageManager()));
-            return true;
-        } else if (this.cosmeticsButton.isMouseInside(mx, my)) {
-            this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            GuiBridge.setScreen(new GuiCosmetics());
-            return true;
+                //? if >=26.3 {
+                /*GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options));
+                 *///? } else {
+                GuiBridge.setScreen(new OptionsScreen(GuiBridge.getScreen(), this.minecraft.options, false));
+                //? }
+                return true;
+            } else if (this.exitButton.isMouseInside(mx, my)) {
+                this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                this.minecraft.stop();
+                return true;
+            } else if (this.languageButton.isMouseInside(mx, my)) {
+                this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                GuiBridge.setScreen(new LanguageSelectScreen(GuiBridge.getScreen(), this.minecraft.options, this.minecraft.getLanguageManager()));
+                return true;
+            } else if (this.cosmeticsButton.isMouseInside(mx, my)) {
+                this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                GuiBridge.setScreen(new GuiCosmetics(null));
+                return true;
+            }
         }
 
         return false;

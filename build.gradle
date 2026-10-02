@@ -53,7 +53,13 @@ tasks.shadowJar {
     mergeServiceFiles {
         include("META-INF/services/org.endlesssource.mediainterface.spi.PlatformMediaProvider")
     }
+    destinationDirectory = rootProject.layout.projectDirectory.dir("out")
 }
+
+tasks.clean {
+    delete rootProject.layout.projectDirectory.dir("out")
+}
+
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", sc.current.version

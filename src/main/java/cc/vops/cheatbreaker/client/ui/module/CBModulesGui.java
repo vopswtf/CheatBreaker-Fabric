@@ -15,6 +15,7 @@ import cc.vops.cheatbreaker.client.util.Keyboard;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import com.mojang.blaze3d.platform.InputConstants;
+import lombok.Getter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -45,6 +46,7 @@ public class CBModulesGui extends AbstractGui {
     public AbstractScrollableElement settingsElement;
     public AbstractScrollableElement focusedElement = null;
 
+    @Getter
     public AbstractScrollableElement currentScrollableElement = null;
     public static boolean allMenusClosed = false;
 
@@ -65,6 +67,9 @@ public class CBModulesGui extends AbstractGui {
     private int arrowKeyMoves;
     private boolean snappedToScreenCenterX = false;
     private boolean snappedToScreenCenterY = false;
+
+    private float resizePivotX, resizePivotY;
+    private float resizeDX0, resizeDY0;
 
     @Override
     protected void initMenu() {
@@ -321,30 +326,41 @@ public class CBModulesGui extends AbstractGui {
                 }
             }
         } else if (this.dataHolder != null) {
-            float f12 = 1.0f;
+            AbstractModule m = this.dataHolder.module;
+            float ms = m.masterScale();
+            float[] p = m.getScaledPoints(true);
+            float left = p[0] * ms;
+            float top = p[1] * ms;
+            float right = (p[0] + m.width) * ms;
+            float bottom = (p[1] + m.height) * ms;
+
+            float pivotX, pivotY;
             switch (this.dataHolder.screenLocation) {
-                case RIGHT_BOTTOM: {
-                    float n4 = mouseY - this.dataHolder.mouseY + (mouseX - this.dataHolder.mouseX);
-                    f12 = this.dataHolder.scale - (float)n4 / (float)115;
+                case LEFT_BOTTOM:
+                    pivotX = left;
+                    pivotY = bottom;
                     break;
-                }
-                case LEFT_TOP: {
-                    float n4 = mouseY - this.dataHolder.mouseY + (mouseX - this.dataHolder.mouseX);
-                    f12 = this.dataHolder.scale + (float)n4 / (float)115;
+                case RIGHT_TOP:
+                    pivotX = right;
+                    pivotY = top;
                     break;
-                }
-                case RIGHT_TOP: {
-                    float n4 = mouseX - this.dataHolder.mouseX - (mouseY - this.dataHolder.mouseY);
-                    f12 = this.dataHolder.scale - (float)n4 / (float)115;
+                case RIGHT_BOTTOM:
+                    pivotX = right;
+                    pivotY = bottom;
                     break;
-                }
-                case LEFT_BOTTOM: {
-                    float n4 = mouseX - this.dataHolder.mouseX - (mouseY - this.dataHolder.mouseY);
-                    f12 = this.dataHolder.scale + (float)n4 / (float)115;
-                }
+                default:
+                    pivotX = left;
+                    pivotY = top;
+                    break;
             }
-            if (f12 >= 1.0421053f * 0.47979796f && f12 <= 1.8962264f * 0.7910448f) {
-                this.dataHolder.module.scale.setValue((float) ((double) Math.round((double) f12 * (double) 100) / (double) 100));
+
+            float dx0 = this.dataHolder.mouseX - pivotX;
+            float dy0 = this.dataHolder.mouseY - pivotY;
+            float f1 = dx0 * dx0 + dy0 * dy0;
+            if (f1 > 1.0f) {
+                float ratio = ((mouseX - pivotX) * dx0 + (mouseY - pivotY) * dy0) / f1;
+                float newScale = Math.max(0.5f, Math.min(1.5f, this.dataHolder.scale * ratio));
+                m.scale.setValue(Math.round(newScale * 100f) / 100f);
             }
         }
         // end of moving module stuff
@@ -721,20 +737,22 @@ public class CBModulesGui extends AbstractGui {
         } else {
             AbstractModule iterator;
             if (!(draggingModule != null && this.IlIlIIIlllllIIIlIlIlIllII || (iterator = this.getModuleAtPosition(mouseX, mouseY)) == null)) {
-                boolean bl;
-                float[] arrf = iterator.getScaledPoints(true);
-                boolean bl2 = !iterator.getSettingsList().isEmpty() && (float)mouseX >= arrf[0] * ((Float) iterator.masterScale()).floatValue() && (float)mouseX <= (arrf[0] + (float)10) * ((Float) iterator.masterScale()).floatValue() && (float)mouseY >= (arrf[1] + iterator.height - (float)10) * ((Float) iterator.masterScale()).floatValue() && (float)mouseY <= (arrf[1] + iterator.height + 2.0f) * ((Float) iterator.masterScale()).floatValue();
-                boolean bl3 = bl = (float)mouseX > (arrf[0] + iterator.width - (float)10) * ((Float) iterator.masterScale()).floatValue() && (float)mouseX < (arrf[0] + iterator.width + 2.0f) * ((Float) iterator.masterScale()).floatValue() && (float)mouseY > (arrf[1] + iterator.height - (float)10) * ((Float) iterator.masterScale()).floatValue() && (float)mouseY < (arrf[1] + iterator.height + 2.0f) * ((Float) iterator.masterScale()).floatValue();
-                if (bl2) {
-                    CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-                    ((ModuleListElement)this.settingsElement).resetColor = false;
-                    ((ModuleListElement)this.settingsElement).module = iterator;
-                    this.currentScrollableElement = this.settingsElement;
-                } else if (bl) {
-                    CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-                    iterator.setState(false);
+                if (iterator.isEnabled()) {
+                    boolean bl;
+                    float[] arrf = iterator.getScaledPoints(true);
+                    boolean bl2 = !iterator.getSettingsList().isEmpty() && (float) mouseX >= arrf[0] * ((Float) iterator.masterScale()).floatValue() && (float) mouseX <= (arrf[0] + (float) 10) * ((Float) iterator.masterScale()).floatValue() && (float) mouseY >= (arrf[1] + iterator.height - (float) 10) * ((Float) iterator.masterScale()).floatValue() && (float) mouseY <= (arrf[1] + iterator.height + 2.0f) * ((Float) iterator.masterScale()).floatValue();
+                    boolean bl3 = bl = (float) mouseX > (arrf[0] + iterator.width - (float) 10) * ((Float) iterator.masterScale()).floatValue() && (float) mouseX < (arrf[0] + iterator.width + 2.0f) * ((Float) iterator.masterScale()).floatValue() && (float) mouseY > (arrf[1] + iterator.height - (float) 10) * ((Float) iterator.masterScale()).floatValue() && (float) mouseY < (arrf[1] + iterator.height + 2.0f) * ((Float) iterator.masterScale()).floatValue();
+                    if (bl2) {
+                        CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                        ((ModuleListElement) this.settingsElement).resetColor = false;
+                        ((ModuleListElement) this.settingsElement).module = iterator;
+                        this.currentScrollableElement = this.settingsElement;
+                    } else if (bl) {
+                        CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                        iterator.setState(false);
+                    }
+                    return true;
                 }
-                return true;
             }
 
             for (AbstractModule module : this.modules) {

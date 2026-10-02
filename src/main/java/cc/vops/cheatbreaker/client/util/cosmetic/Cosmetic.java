@@ -6,9 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.resources.Identifier;
 
+import java.util.UUID;
+
 @Getter @Setter
 public class Cosmetic {
-    private String playerId;
     private String name;
 
     private CosmeticType type;
@@ -26,7 +27,6 @@ public class Cosmetic {
 
     public Cosmetic(long time, String playerId, String name, CosmeticType type, float scale, boolean equipped, String location) {
         this.lastUpdate = time;
-        this.playerId = playerId;
         this.name = name;
         this.type = type;
         this.scale = scale;
@@ -44,7 +44,6 @@ public class Cosmetic {
     }
 
     public Cosmetic(String playerId, String name, CosmeticType type, float scale, boolean equipped, String location) {
-        this.playerId = playerId;
         this.name = name;
         this.type = type;
         this.scale = scale;
@@ -62,7 +61,6 @@ public class Cosmetic {
     }
 
     public Cosmetic(String playerId, int emoteId, CosmeticType type) {
-        this.playerId = playerId;
         this.emoteId = emoteId;
         this.type = type;
 

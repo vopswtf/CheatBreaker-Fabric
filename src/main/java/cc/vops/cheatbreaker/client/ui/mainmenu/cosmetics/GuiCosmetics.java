@@ -9,9 +9,12 @@ import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
 import cc.vops.cheatbreaker.client.util.cosmetic.Cosmetic;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +25,11 @@ public class GuiCosmetics extends MainMenuBase {
     private Identifier rightIcon = CheatBreaker.asset("icons/right.png");
     private final GradientTextButton backButton = new GradientTextButton("BACK");
     private int IllIIIIIIIlIlIllllIIllIII = 0;
+    private Screen lastScreen;
 
-    public GuiCosmetics() {
-        for (Cosmetic cosmetic : CheatBreaker.getInstance().getCosmetics()) {
+    public GuiCosmetics(@Nullable Screen lastScreen) {
+        this.lastScreen = lastScreen;
+        for (Cosmetic cosmetic : CheatBreaker.getInstance().getLocalCosmetics()) {
             this.cosmeticElements.add(new CosmeticListElement(cosmetic, 1.0f));
         }
     }
@@ -77,7 +82,11 @@ public class GuiCosmetics extends MainMenuBase {
         super.onMouseClicked(f, f2, n);
         if (this.backButton.isMouseInside(f, f2)) {
             CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
-            GuiBridge.setScreen(new MainMenu());
+            if (this.lastScreen != null) {
+                GuiBridge.setScreen(this.lastScreen);
+            } else {
+                GuiBridge.setScreen(new MainMenu());
+            }
         } else {
             int n2;
             if (this.cosmeticElements.size() > 5) {

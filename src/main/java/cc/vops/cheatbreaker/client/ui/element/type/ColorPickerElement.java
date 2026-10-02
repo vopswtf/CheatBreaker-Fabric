@@ -7,11 +7,13 @@ import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.Mouse;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.render.GradientRectRenderState;
+import cc.vops.cheatbreaker.mixin.TextColorAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -50,14 +52,9 @@ public class ColorPickerElement extends AbstractModuleTypeElement {
         this.setting = setting;
         this.colorPickerColorElement = new ColorPickerColorElement(f, (Integer)setting.getValue());
         this.colors = new ArrayList<>();
-        for (ChatFormatting value : ChatFormatting.values()) {
-            if (!this.isColor(value)) continue;
-            this.colors.add(new ColorPickerColorElement(f, value.toString().charAt(1)));
+        for (TextColor value : TextColorAccessor.getNamedColors().values()) {
+            this.colors.add(new ColorPickerColorElement(f, value.getValue()));
         }
-    }
-
-    private boolean isColor(ChatFormatting c) {
-        return c != ChatFormatting.OBFUSCATED && c != ChatFormatting.BOLD && c != ChatFormatting.STRIKETHROUGH && c != ChatFormatting.UNDERLINE && c != ChatFormatting.ITALIC && c != ChatFormatting.RESET;
     }
 
     @Override

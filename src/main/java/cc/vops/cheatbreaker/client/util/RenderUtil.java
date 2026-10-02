@@ -371,6 +371,28 @@ public class RenderUtil {
                 360.0f
         ));
     }
+    private static final boolean CLOCKWISE_ANGLES = true;
+
+    public static void drawCircleWithOutLine(GuiGraphicsExtractor gfx, double cx, double cy, double outerRadius, double innerRadius, double d5, int n, double d6, int color) {
+        d5 = (d5 + (double) n) % (double) n;
+        float start = (float) (360.0 / n * d5);
+        float end = (float) (360.0 / n * (d5 + d6));
+        if (CLOCKWISE_ANGLES) {
+            float s = start;
+            start = -end;
+            end = -s;
+        }
+        gfx.guiRenderState.addGuiElement(new RadialRenderState(
+                gfx.pose(),
+                gfx.scissorStack.peek(),
+                (float) cx, (float) cy,
+                color,
+                (float) outerRadius,
+                (float) innerRadius,
+                start,
+                end
+        ));
+    }
 
     public static void drawRadial(GuiGraphicsExtractor gfx, double centerX, double centerY, double innerRadius, double outerRadius, double startAngle, double endAngle, int color) {
         gfx.guiRenderState.addGuiElement(

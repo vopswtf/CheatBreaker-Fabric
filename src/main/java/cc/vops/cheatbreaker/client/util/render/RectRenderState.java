@@ -39,10 +39,10 @@ public class RectRenderState extends CBRenderState {
     @Override
     public ScreenRectangle getBounds() {
         ScreenRectangle rect = new ScreenRectangle(
-                Mth.floor(x0),
-                Mth.floor(y0),
-                Mth.ceil(x1) - Mth.floor(x0),
-                Mth.ceil(y1) - Mth.floor(y0)
+                Mth.floor(x0) - 1,
+                Mth.floor(y0) - 1,
+                Mth.ceil(x1) - Mth.floor(x0) + 2,
+                Mth.ceil(y1) - Mth.floor(y0) + 2
         ).transformMaxBounds(pose);
 
         return scissorArea != null ? scissorArea.intersection(rect) : rect;

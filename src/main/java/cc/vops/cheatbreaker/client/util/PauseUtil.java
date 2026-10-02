@@ -5,7 +5,6 @@ import cc.vops.cheatbreaker.client.ui.fading.CosineFade;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.opengl.GL11;
 
 public class PauseUtil {
     public static final Identifier outer = CheatBreaker.asset("logo_255_outer.png");

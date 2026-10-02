@@ -64,7 +64,7 @@ public class CosmeticListElement extends AbstractModulesGuiElement {
                 this.cosmetic.setEquipped(false);
             } else {
                 this.cosmetic.setEquipped(true);
-                for (Cosmetic cosmetic : CheatBreaker.getInstance().getCosmetics()) {
+                for (Cosmetic cosmetic : CheatBreaker.getInstance().getLocalCosmetics()) {
                     if (cosmetic == this.cosmetic || !cosmetic.getType().equals(this.cosmetic.getType())) continue;
                     cosmetic.setEquipped(false);
                 }

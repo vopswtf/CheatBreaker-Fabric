@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class DashThread extends Thread {
     @Override
     public void run() {
-        while (CheatBreaker.getInstance().isEnabled()) {
+        while (!Minecraft.getInstance().getWindow().shouldClose()) {
             try {
                 while (true) {
                     if (!Minecraft.getInstance().isRunning()) return;
@@ -39,6 +39,7 @@ public class DashThread extends Thread {
                 }
             }
             catch (Exception exception) {
+                if (exception instanceof InterruptedException) return;
                 exception.printStackTrace();
                 continue;
             }

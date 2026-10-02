@@ -16,7 +16,7 @@ public class ThreadSoundQueue implements Runnable
 
     @Override
     public void run() {
-        while (CheatBreaker.getInstance().isEnabled()) {
+        while (!Minecraft.getInstance().getWindow().shouldClose()) {
             if (!this.sndManager.queue.isEmpty()) {
 //                final Datalet data = this.sndManager.queue.poll();
 //                if (data == null) {

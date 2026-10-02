@@ -4,6 +4,7 @@ import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.audio.voicechat.VoiceChat;
 import cc.vops.cheatbreaker.client.module.type.*;
 import cc.vops.cheatbreaker.client.module.type.armorstatus.ArmorStatusModule;
+import cc.vops.cheatbreaker.client.module.type.cooldown.CooldownsModule;
 import cc.vops.cheatbreaker.client.module.type.keystrokes.KeystrokesModule;
 import cc.vops.cheatbreaker.client.module.type.minimap.MiniMapModule;
 import cc.vops.cheatbreaker.client.module.type.notification.CBNotificationsModule;
@@ -53,8 +54,18 @@ public class ModuleManager {
         modules.add(new OverlayModule());
         modules.add(new PotionCounterModule());
         modules.add(new SaturationModule());
+        modules.add(new CooldownsModule());
         this.voiceChat = new VoiceChat();
         this.teammatesModule = new TeammatesModule();
+    }
+
+    public static <T extends AbstractModule> T getModule(Class<T> moduleClass) {
+        for (AbstractModule module : CheatBreaker.getInstance().getModuleManager().modules) {
+            if (moduleClass.isInstance(module)) {
+                return moduleClass.cast(module);
+            }
+        }
+        throw new IllegalArgumentException("Module not found: " + moduleClass.getName());
     }
 
     public static void registerModule(Class<? extends AbstractModule> moduleClass) {

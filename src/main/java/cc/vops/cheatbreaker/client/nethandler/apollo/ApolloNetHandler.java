@@ -1,6 +1,8 @@
 package cc.vops.cheatbreaker.client.nethandler.apollo;
 
 import cc.vops.cheatbreaker.CheatBreaker;
+import cc.vops.cheatbreaker.client.module.ModuleManager;
+import cc.vops.cheatbreaker.client.module.type.cooldown.CooldownsModule;
 import cc.vops.cheatbreaker.client.module.type.minimap.Waypoint;
 import com.google.gson.JsonParser;
 import com.google.protobuf.Any;
@@ -8,10 +10,12 @@ import com.lunarclient.apollo.chat.v1.ChatButton;
 import com.lunarclient.apollo.chat.v1.DisplayChatButtonsMessage;
 import com.lunarclient.apollo.chat.v1.RemoveChatButtonMessage;
 import com.lunarclient.apollo.chat.v1.ResetChatButtonsMessage;
-import com.lunarclient.apollo.common.v1.Component;
 import com.lunarclient.apollo.common.v1.LunarClientVersion;
 import com.lunarclient.apollo.common.v1.MinecraftVersion;
 import com.lunarclient.apollo.common.v1.Uuid;
+import com.lunarclient.apollo.cooldown.v1.DisplayCooldownMessage;
+import com.lunarclient.apollo.cooldown.v1.RemoveCooldownMessage;
+import com.lunarclient.apollo.cooldown.v1.ResetCooldownsMessage;
 import com.lunarclient.apollo.nametag.v1.OverrideNametagMessage;
 import com.lunarclient.apollo.nametag.v1.ResetNametagMessage;
 import com.lunarclient.apollo.notification.v1.DisplayNotificationMessage;
@@ -108,6 +112,12 @@ public class ApolloNetHandler {
                             currentChatButtons.removeIf(button -> button.hasButton() && button.getButton().getId().equals(msg.getId()));
                         } else if (any.is(ResetChatButtonsMessage.class)) {
                             currentChatButtons.clear();
+                        } else if (any.is(DisplayCooldownMessage.class)) {
+                            ModuleManager.getModule(CooldownsModule.class).addCooldown(any.unpack(DisplayCooldownMessage.class));
+                        } else if (any.is(RemoveCooldownMessage.class)) {
+                            ModuleManager.getModule(CooldownsModule.class).removeCooldown(any.unpack(RemoveCooldownMessage.class));
+                        } else if (any.is(ResetCooldownsMessage.class)) {
+                            ModuleManager.getModule(CooldownsModule.class).resetCooldowns();
                         }
                         else {
 //                            CheatBreaker.LOGGER.info("todo: " + any.getTypeUrl());

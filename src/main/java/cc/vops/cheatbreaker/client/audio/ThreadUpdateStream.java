@@ -22,8 +22,7 @@ public class ThreadUpdateStream implements Runnable
 
     @Override
     public void run() {
-        while (CheatBreaker.getInstance().isEnabled()) {
-            if (!Minecraft.getInstance().isRunning()) return;
+        while (!Minecraft.getInstance().getWindow().shouldClose()) {
             if (!manager.talking.isEmpty()) {
 //                for (Map.Entry<UUID, ClientStream> entry : manager.talking.entrySet()) {
 //                    ClientStream stream = entry.getValue();

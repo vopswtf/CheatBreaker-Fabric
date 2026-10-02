@@ -6,6 +6,7 @@ public class EasingFunctions {
             case "easeinquad" -> easeInQuad(progress);
             case "easeoutquad" -> easeOutQuad(progress);
             case "easeinoutquad" -> easeInOutQuad(progress);
+            case "easeinoutsine" -> easeInOutSine(progress);
             case "easeincubic" -> easeInCubic(progress);
             case "easeoutcubic" -> easeOutCubic(progress);
             case "easeinoutcubic" -> easeInOutCubic(progress);
@@ -27,4 +28,5 @@ public class EasingFunctions {
     public static float easeInCubic(float t) { return t * t * t; }
     public static float easeOutCubic(float t) { return 1 - (float)Math.pow(1 - t, 3); }
     public static float easeInOutCubic(float t) { return t < 0.5f ? 4 * t * t * t : 1 - (float)Math.pow(-2 * t + 2, 3) / 2; }
+    public static float easeInOutSine(float t) { return (float)(-(Math.cos(Math.PI * t) - 1) / 2); }
 }

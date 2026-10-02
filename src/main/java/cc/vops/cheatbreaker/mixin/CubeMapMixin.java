@@ -11,9 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // panorama
 @Mixin(CubeMap.class)
 public class CubeMapMixin {
-    @Unique
-    private static final Identifier CUSTOM_LOCATION = CheatBreaker.asset("panorama/panorama");
-
     @Shadow
     @Mutable
     @Final
@@ -21,6 +18,6 @@ public class CubeMapMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void onInit(Identifier original, CallbackInfo ci) {
-        this.location = CUSTOM_LOCATION;
+        this.location = CheatBreaker.asset("panorama/panorama");
     }
 }

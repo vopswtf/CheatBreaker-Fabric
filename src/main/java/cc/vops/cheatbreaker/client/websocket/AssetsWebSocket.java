@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
@@ -103,6 +104,15 @@ public class AssetsWebSocket extends WebSocketClient {
 //        if (Objects.equals(Minecraft.getMinecraft().getSession().getUsername(), Minecraft.getMinecraft().getSession().getPlayerID())) {
 //            this.close();
 //        }
+
+        if (Minecraft.getInstance().level != null) {
+            for (Entity entity : Minecraft.getInstance().level.entitiesForRendering()) {
+                if (entity instanceof Player) {
+                    // TODO mass player join packet
+                    this.sendPlayerJoin(entity.getUUID());
+                }
+            }
+        }
     }
 
     @Override
@@ -275,24 +285,31 @@ public class AssetsWebSocket extends WebSocketClient {
     }
 
     public void handleCosmetics(WSPacketCosmetics packetCosmetics) {
-        String string = packetCosmetics.getPlayerId();
-        CheatBreaker.getInstance().getCosmetics().removeIf(c -> c.getPlayerId().equals(string));
+        try {
+            UUID uuid = UUID.fromString(packetCosmetics.getPlayerId());
+            CheatBreaker.getInstance().getCosmetics().remove(uuid);
 
-        for (Cosmetic cosmetic : packetCosmetics.getCosmetics()) {
-            try {
-                CheatBreaker.getInstance().getCosmetics().add(cosmetic);
+            for (Cosmetic cosmetic : packetCosmetics.getCosmetics()) {
+                try {
+                    CheatBreaker.getInstance().getCosmetics().computeIfAbsent(uuid, k -> new ArrayList<>()).add(cosmetic);
+                }
+                catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
-            catch (Exception exception) {
-                exception.printStackTrace();
-            }
+        } catch (IllegalArgumentException e) {
+            CheatBreaker.LOGGER.info("Invalid UUID: " + packetCosmetics.getPlayerId());
         }
     }
 
     @Override
     public void onClose(int n, String string, boolean bl) {
         CheatBreaker.LOGGER.info("Close: " + string + " (" + n + ")");
-        if (!CheatBreaker.getInstance().isEnabled()) return;
-        new WSReconnectThread().start();
+        if (Minecraft.getInstance().getWindow().shouldClose()) return;
+        Thread thread = new WSReconnectThread();
+        thread.setDaemon(true);
+        thread.start();
+
         SocialOverlayScreen.getInstance().getFriendRequestsElement().getElements().clear();
         SocialOverlayScreen.getInstance().getFriendsListElement().getElements().clear();
         CheatBreaker.getInstance().getFriendsManager().getFriends().clear();
@@ -387,7 +404,7 @@ public class AssetsWebSocket extends WebSocketClient {
 
     public void sendClientCosmetics() {
 //        System.out.println("Sending cosmetics (" + CheatBreaker.getInstance().getCosmetics().size() + ")");
-        this.send(new WSPacketClientCosmetics(CheatBreaker.getInstance().getCosmetics()));
+        this.send(new WSPacketClientCosmetics(CheatBreaker.getInstance().getLocalCosmetics()));
     }
 
     public void updateClientStatus() {

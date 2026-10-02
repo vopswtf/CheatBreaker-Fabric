@@ -63,6 +63,8 @@ public class GlobalSettings {
     public Setting showChatBackground;
     public Setting shinyPots;
     public Setting showSelfNametag;
+    public Setting showHitboxEyeHeight;
+    public Setting showHitboxArrows;
     public Setting showTeamHeads;
     public Setting showPotionInfo;
     public Setting clearGlass;
@@ -159,6 +161,8 @@ public class GlobalSettings {
         this.snapModules = new Setting(this.settingsList, "Snap mods to other mods (GUI)").setValue(true);
         this.renderSettingsLabel = new Setting(this.settingsList, "label").setValue("Render Settings");
         this.showSelfNametag = new Setting(this.settingsList, "Show own nametag").setValue(true);
+        this.showHitboxEyeHeight = new Setting(this.settingsList, "Show hitbox eye height").setValue(false);
+        this.showHitboxArrows = new Setting(this.settingsList, "Show hitbox arrows").setValue(false);
         this.showPotionInfo = new Setting(this.settingsList, "Show Potion info in inventory").setValue(true);
         this.showChatBackground = new Setting(this.settingsList, "Show chat background").setValue(true);
         this.showHudInDebug = new Setting(this.settingsList, "Show HUD while in debug view").setValue(false);

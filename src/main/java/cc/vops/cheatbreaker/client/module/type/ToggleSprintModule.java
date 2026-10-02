@@ -40,6 +40,7 @@ public class ToggleSprintModule extends AbstractModule {
     public Setting sprintToggledString;
     public Setting sneakToggledString;
 
+    // TODO: seems to be an issue with beacons/potions killing your sprint state when speed is applied. idk look into later
     public ToggleSprintModule() {
         super("ToggleSprint");
         this.setDefaultAnchor(GuiAnchor.LEFT_TOP);

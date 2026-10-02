@@ -4,8 +4,10 @@ import cc.vops.cheatbreaker.client.ui.fading.ColorFade;
 import cc.vops.cheatbreaker.client.ui.mainmenu.AbstractElement;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.font.Fonts;
+import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
+@Getter
 public class TextButtonElement extends AbstractElement {
     private final String text;
     private final ColorFade textColorFade;

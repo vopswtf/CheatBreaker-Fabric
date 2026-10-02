@@ -5,18 +5,32 @@ import cc.vops.cheatbreaker.client.ui.fading.CosineFade;
 import cc.vops.cheatbreaker.client.ui.fading.MinMaxFade;
 import cc.vops.cheatbreaker.client.ui.mainmenu.dev.GuiRenderTest;
 import cc.vops.cheatbreaker.client.ui.mainmenu.element.GradientTextButton;
+import cc.vops.cheatbreaker.client.ui.mainmenu.element.TextButtonElement;
 import cc.vops.cheatbreaker.client.ui.overlay.SocialOverlayScreen;
 import cc.vops.cheatbreaker.client.util.RenderUtil;
 import cc.vops.cheatbreaker.client.util.Sounds;
 import cc.vops.cheatbreaker.client.util.bridge.GuiBridge;
+import cc.vops.cheatbreaker.client.util.font.Fonts;
 import cc.vops.cheatbreaker.client.util.friend.FriendsManager;
+import cc.vops.cheatbreaker.mixin.ScreenAccessor;
 import com.mojang.realmsclient.RealmsMainScreen;
+import lombok.Getter;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainMenu extends MainMenuBase {
     private final Identifier outerLogo = CheatBreaker.asset("logo_255_outer.png");
@@ -28,15 +42,50 @@ public class MainMenu extends MainMenuBase {
     private final CosineFade logoTurnAmount;
     private final MinMaxFade loadingScreenBackgroundFade = new MinMaxFade(400L);
 
+    // need to support the other mods!
+    private final TitleScreen titleScreen;
+    private final List<TitleRenderable> renderables = new ArrayList<>();
+
     private static int loadCount;
 
     public MainMenu() {
         this.logoTurnAmount = new CosineFade(4000L);
+        this.titleScreen = new TitleScreen();
+    }
+
+    private int lastRenderables = -1;
+
+    @Override
+    public void tick() {
+        super.tick();
+        titleScreen.tick();
+
+        ScreenAccessor accessor = (ScreenAccessor) this.titleScreen;
+        if (!accessor.getRenderables().isEmpty() && accessor.getRenderables().size() != lastRenderables) {
+            lastRenderables = accessor.getRenderables().size();
+            renderables.clear();
+
+
+            for (Renderable renderable : accessor.getRenderables()) {
+                if (renderable.getClass().getName().startsWith("net.minecraft")) continue;
+                renderables.add(new TitleRenderable(renderable));
+            }
+
+            float x = 5;
+            float y = ((float) this.getScaledHeight() / 2) - (renderables.size() * 22f / 2f);
+            for (TitleRenderable renderable : renderables) {
+                renderable.getButton().setElementSize(x, y, Fonts.robotoBold14.width(renderable.getButton().getText()) + 6f, 20);
+                y += 22;
+            }
+        }
     }
 
     @Override
     protected void initMenu() {
         super.initMenu();
+        titleScreen.init(width, height);
+        renderables.clear();
+        lastRenderables = -1;
 
         this.singleplayerButton.setElementSize(this.getScaledWidth() / 2.0f - (float)50, this.getScaledHeight() / 2.0f + (float)5, (float)100, 12);
         this.multiplayerButton.setElementSize(this.getScaledWidth() / 2.0f - (float)50, this.getScaledHeight() / 2.0f + (float)24, (float)100, 12);
@@ -75,6 +124,10 @@ public class MainMenu extends MainMenuBase {
 
         float logoY = this.isFirstOpened() ? this.logoPositionFade.getCurrentValue() : 1.0f;
         this.drawCheatBreakerLogo(gfx, this.getScaledWidth(), this.getScaledHeight(), logoY);
+
+        for (TitleRenderable renderable : this.renderables) {
+            renderable.getButton().drawElement(gfx, mouseX, mouseY, true);
+        }
     }
 
     private void drawCheatBreakerLogo(GuiGraphicsExtractor gfx, double dispWidth, double dispHeight, float f) {
@@ -111,6 +164,19 @@ public class MainMenu extends MainMenuBase {
             return true;
         }
 
+        for (TitleRenderable renderable : this.renderables) {
+            if (renderable.getButton().isMouseInside(mx, my)) {
+                CheatBreaker.playSound(SoundEvents.UI_BUTTON_CLICK);
+                if (renderable.getRenderable() instanceof Button btn) {
+                    double x = btn.getX() + btn.getWidth() / 2.0;
+                    double y = btn.getY() + btn.getHeight() / 2.0;
+
+                    btn.mouseClicked(new MouseButtonEvent(x, y, new MouseButtonInfo(button, 0)), false);
+                }
+                return true;
+            }
+        }
+
         // if click in bottom right in the screen and is fabric dev
         if (FabricLoader.getInstance().isDevelopmentEnvironment() && mx > this.getScaledWidth() - 50 && my > this.getScaledHeight() - 20) {
             GuiBridge.setScreen(new GuiRenderTest());
@@ -122,5 +188,26 @@ public class MainMenu extends MainMenuBase {
 
     public boolean isFirstOpened() {
         return loadCount <= 2;
+    }
+
+    @Getter
+    private static class TitleRenderable implements Renderable {
+        private final Renderable renderable;
+        private final TextButtonElement button;
+
+        public TitleRenderable(Renderable renderable) {
+            this.renderable = renderable;
+
+            if (renderable instanceof Button btn && !btn.getMessage().getString().isEmpty()) {
+                this.button = new TextButtonElement(btn.getMessage().getString().toUpperCase());
+            } else {
+                this.button = new TextButtonElement(renderable.getClass().getSimpleName().toUpperCase());
+            }
+        }
+
+        @Override
+        public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+            // IGNORE OTHER MODS!!!! :100:
+        }
     }
 }

@@ -3,6 +3,8 @@ package cc.vops.cheatbreaker.client.ui.element.module;
 import cc.vops.cheatbreaker.CheatBreaker;
 import cc.vops.cheatbreaker.client.config.Setting;
 import cc.vops.cheatbreaker.client.module.AbstractModule;
+import cc.vops.cheatbreaker.client.module.type.cooldown.CooldownRenderer;
+import cc.vops.cheatbreaker.client.module.type.cooldown.CooldownsModule;
 import cc.vops.cheatbreaker.client.ui.element.AbstractModulesGuiElement;
 import cc.vops.cheatbreaker.client.ui.element.AbstractScrollableElement;
 import cc.vops.cheatbreaker.client.ui.module.CBModulePlaceGui;
@@ -70,7 +72,10 @@ public class ModulePreviewElement extends AbstractModulesGuiElement {
             RenderUtil.drawCenteredStringWithShadow(gui, Minecraft.getInstance().font, "§c1", this.x + this.width - 26, this.y + this.height / 2 - 28, -1);
         }
 
-        if ((this.module.getPreviewType() == null || this.module.getPreviewType() == AbstractModule.PreviewType.LABEL) && this.module != CheatBreaker.getInstance().getModuleManager().scoreboard) {
+        if (this.module instanceof CooldownsModule cooldownsModule) {
+            var cooldown = new CooldownRenderer("EnderPearl", "ender_pearl", 9000L);
+            cooldown.render(gui, cooldownsModule.colorTheme, this.x + (float) this.width / 2 - 18, this.y + (float) this.height / 2 - 26 - 18, -1);
+        } else if ((this.module.getPreviewType() == null || this.module.getPreviewType() == AbstractModule.PreviewType.LABEL) && this.module != CheatBreaker.getInstance().getModuleManager().scoreboard) {
             object = "";
             Font minecraftFont = Minecraft.getInstance().font;
             if (this.module.getPreviewType() == null) {
