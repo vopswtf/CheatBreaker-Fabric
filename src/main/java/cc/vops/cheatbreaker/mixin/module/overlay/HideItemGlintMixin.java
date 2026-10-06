@@ -9,12 +9,12 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //? if >=26.2 {
-/*import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
+import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 @Mixin(ItemFeatureRenderer.class)
-*///? } else {
-import net.minecraft.client.renderer.SubmitNodeStorage;
+//? } else {
+/*import net.minecraft.client.renderer.SubmitNodeStorage;
 @Mixin(SubmitNodeStorage.ItemSubmit.class)
-//? }
+*///? }
 
 public class HideItemGlintMixin {
 
@@ -36,12 +36,12 @@ public class HideItemGlintMixin {
         return foilType;
     }
     *///? } else if >=26.2 {
-    /*/^@ModifyVariable(
+    /*@ModifyVariable(
             method = "prepareSubmit",
             at = @At("HEAD"),
             argsOnly = true,
             index = 2
-    )^/
+    )*/
     private boolean forceFoilFalse(boolean foil) {
         if (OverlayModule.getInstance() != null && OverlayModule.getInstance().isEnabled() && OverlayModule.getInstance().getEnchantmentGlint().getAsString().equals("Hide")) {
             return false;
@@ -49,12 +49,12 @@ public class HideItemGlintMixin {
 
         return foil;
     }
-    *///? } else {
-    @Inject(method = "foilType", at = @At("HEAD"), cancellable = true)
+    //? } else {
+    /*@Inject(method = "foilType", at = @At("HEAD"), cancellable = true)
     public void foilType(CallbackInfoReturnable<ItemStackRenderState.FoilType> cir) {
         if (OverlayModule.getInstance() != null && OverlayModule.getInstance().isEnabled() && OverlayModule.getInstance().getEnchantmentGlint().getAsString().equals("Hide")) {
             cir.setReturnValue(ItemStackRenderState.FoilType.NONE);
         }
     }
-    //? }
+    *///? }
 }

@@ -34,17 +34,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Gui;
 
 //? if >=26.2 {
-/*import net.minecraft.client.gui.Hud;
+import net.minecraft.client.gui.Hud;
 @Mixin(Hud.class)
-*///? } else {
-@Mixin(Gui.class)
-//? }
+//? } else {
+/*@Mixin(Gui.class)
+*///? }
 public class GuiMixin {
 
     @Shadow @Final private static Identifier VIGNETTE_LOCATION;
 
     //? if >=26.2 {
-    /*@Shadow private boolean isHidden;
+    @Shadow private boolean isHidden;
     @Inject(
             method = "extractDemoOverlay",
             at = @At("HEAD")
@@ -54,12 +54,12 @@ public class GuiMixin {
             CheatBreaker.getInstance().getEventBus().callEvent(new GuiDrawEvent(graphics, deltaTracker));
         }
     }
-    *///? } else {
-    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    //? } else {
+    /*@Inject(method = "extractRenderState", at = @At("TAIL"))
     public void render(GuiGraphicsExtractor gfx, DeltaTracker deltaTracker, CallbackInfo ci) {
         CheatBreaker.getInstance().getEventBus().callEvent(new GuiDrawEvent(gfx, deltaTracker));
     }
-    //? }
+    *///? }
 
 
     @Inject(method = "extractVignette", at = @At("HEAD"), cancellable = true)

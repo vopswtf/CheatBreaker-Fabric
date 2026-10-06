@@ -18,6 +18,7 @@ import com.lunarclient.apollo.cooldown.v1.RemoveCooldownMessage;
 import com.lunarclient.apollo.cooldown.v1.ResetCooldownsMessage;
 import com.lunarclient.apollo.nametag.v1.OverrideNametagMessage;
 import com.lunarclient.apollo.nametag.v1.ResetNametagMessage;
+import com.lunarclient.apollo.nametag.v1.ResetNametagsMessage;
 import com.lunarclient.apollo.notification.v1.DisplayNotificationMessage;
 import com.lunarclient.apollo.player.v1.EmbeddedCheckoutSupport;
 import com.lunarclient.apollo.player.v1.PlayerHandshakeMessage;
@@ -88,7 +89,7 @@ public class ApolloNetHandler {
                     try {
                         if (any.is(OverrideNametagMessage.class)) {
                             overrideNametagMessage(any.unpack(OverrideNametagMessage.class));
-                        } else if (any.is(ResetNametagMessage.class)) {
+                        } else if (any.is(ResetNametagsMessage.class)) {
                             this.adventureNametagOverrides.clear();
                         } else if (any.is(ResetNametagMessage.class)) {
                             this.adventureNametagOverrides.remove(convertApolloUUID(any.unpack(ResetNametagMessage.class).getPlayerUuid()));

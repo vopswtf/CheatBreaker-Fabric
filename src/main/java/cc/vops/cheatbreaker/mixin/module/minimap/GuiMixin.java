@@ -11,12 +11,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >=26.2 {
-/*import net.minecraft.client.gui.Hud;
+import net.minecraft.client.gui.Hud;
 @Mixin(Hud.class)
-*///? } else {
-import net.minecraft.client.gui.Gui;
+//? } else {
+/*import net.minecraft.client.gui.Gui;
 @Mixin(Gui.class)
-//? }
+*///? }
 
 public class GuiMixin {
     @Inject(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;getSelectedItem()Lnet/minecraft/world/item/ItemStack;"))

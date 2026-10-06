@@ -68,6 +68,7 @@ public class MainMenu extends MainMenuBase {
 
             for (Renderable renderable : accessor.getRenderables()) {
                 if (renderable.getClass().getName().startsWith("net.minecraft")) continue;
+                if (!(renderable instanceof Button)) continue;
                 renderables.add(new TitleRenderable(renderable));
             }
 
